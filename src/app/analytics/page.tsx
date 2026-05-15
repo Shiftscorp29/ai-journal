@@ -59,19 +59,30 @@ export default function AnalyticsPage() {
     }
   }
 
+  // UNIQUE TIMESTAMP DATA
+
   const chartData = entries.map((entry) => ({
 
     date:
 
       new Date(
         entry.created_at
-      ).toLocaleDateString(),
+      ).toLocaleString([], {
+
+        month: 'short',
+
+        day: 'numeric',
+
+        hour: '2-digit',
+
+        minute: '2-digit',
+      }),
 
     stress:
-      entry.stress_level,
+      Number(entry.stress_level) || 0,
 
     positivity:
-      entry.positivity_score,
+      Number(entry.positivity_score) || 0,
   }))
 
   const averageStress =
@@ -129,7 +140,7 @@ export default function AnalyticsPage() {
       "
     >
 
-      {/* Glow */}
+      {/* Ambient Glow */}
 
       <div className="fixed inset-0 -z-10 overflow-hidden">
 
@@ -243,9 +254,10 @@ export default function AnalyticsPage() {
           "
         >
 
-          Visualize emotional growth,
-          positivity patterns,
-          and mental clarity over time.
+          Visualize emotional patterns,
+          positivity growth,
+          stress fluctuations,
+          and reflective progress over time.
 
         </motion.p>
 
@@ -375,7 +387,7 @@ export default function AnalyticsPage() {
 
       <div className="space-y-10">
 
-        {/* Stress */}
+        {/* Stress Chart */}
 
         <motion.div
 
@@ -474,18 +486,34 @@ export default function AnalyticsPage() {
                 />
 
                 <XAxis
+
                   dataKey="date"
+
                   stroke="#888"
+
                 />
 
                 <YAxis stroke="#888" />
 
                 <Tooltip
 
+                  formatter={(value) => [
+
+                    `${value}`,
+
+                  ]}
+
+                  labelStyle={{
+
+                    color: 'white',
+
+                    marginBottom: '8px',
+                  }}
+
                   contentStyle={{
 
                     background:
-                      'rgba(15,15,15,0.9)',
+                      'rgba(15,15,15,0.92)',
 
                     border:
                       '1px solid rgba(255,255,255,0.08)',
@@ -493,6 +521,12 @@ export default function AnalyticsPage() {
                     borderRadius: '20px',
 
                     color: 'white',
+
+                    backdropFilter:
+                      'blur(20px)',
+
+                    boxShadow:
+                      '0 10px 40px rgba(0,0,0,0.35)',
                   }}
                 />
 
@@ -529,7 +563,7 @@ export default function AnalyticsPage() {
 
         </motion.div>
 
-        {/* Positivity */}
+        {/* Positivity Chart */}
 
         <motion.div
 
@@ -591,18 +625,34 @@ export default function AnalyticsPage() {
                 />
 
                 <XAxis
+
                   dataKey="date"
+
                   stroke="#888"
+
                 />
 
                 <YAxis stroke="#888" />
 
                 <Tooltip
 
+                  formatter={(value) => [
+
+                    `${value}`,
+
+                  ]}
+
+                  labelStyle={{
+
+                    color: 'white',
+
+                    marginBottom: '8px',
+                  }}
+
                   contentStyle={{
 
                     background:
-                      'rgba(15,15,15,0.9)',
+                      'rgba(15,15,15,0.92)',
 
                     border:
                       '1px solid rgba(255,255,255,0.08)',
@@ -610,6 +660,12 @@ export default function AnalyticsPage() {
                     borderRadius: '20px',
 
                     color: 'white',
+
+                    backdropFilter:
+                      'blur(20px)',
+
+                    boxShadow:
+                      '0 10px 40px rgba(0,0,0,0.35)',
                   }}
                 />
 
