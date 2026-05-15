@@ -4,7 +4,15 @@ import { useEffect, useState } from 'react'
 
 import { motion } from 'framer-motion'
 
-import { Trash2 } from 'lucide-react'
+import {
+
+  Trash2,
+
+  Flame,
+
+  Heart,
+
+} from 'lucide-react'
 
 import { supabase } from '@/lib/supabase'
 
@@ -92,7 +100,7 @@ export default function TimelinePage() {
       "
     >
 
-      {/* Glow */}
+      {/* Ambient Glow */}
 
       <div className="fixed inset-0 -z-10 overflow-hidden">
 
@@ -206,7 +214,8 @@ export default function TimelinePage() {
           "
         >
 
-          Your emotional memories, reflections, and AI insights.
+          Emotional memories, AI reflections,
+          and personal growth over time.
 
         </motion.p>
 
@@ -258,7 +267,7 @@ export default function TimelinePage() {
             }}
           >
 
-            {/* Top */}
+            {/* Top Section */}
 
             <div className="
 
@@ -266,7 +275,9 @@ export default function TimelinePage() {
 
               gap-4
 
-              mb-6
+              mb-8
+
+              flex-wrap
 
             ">
 
@@ -274,7 +285,7 @@ export default function TimelinePage() {
 
                 <h2 className="
 
-                  text-2xl
+                  text-3xl
 
                   font-semibold
 
@@ -282,7 +293,7 @@ export default function TimelinePage() {
 
                 ">
 
-                  {entry.mood}
+                  {entry.mood || 'Reflective'}
 
                 </h2>
 
@@ -306,7 +317,7 @@ export default function TimelinePage() {
 
               </div>
 
-              {/* Delete Button */}
+              {/* Delete */}
 
               <button
 
@@ -349,51 +360,269 @@ export default function TimelinePage() {
 
             </div>
 
-            {/* Stats */}
+            {/* Emotional Stats */}
 
             <div className="
 
-              flex flex-wrap gap-3
+              grid
 
-              mb-8
+              grid-cols-1 md:grid-cols-2
+
+              gap-5
+
+              mb-10
 
             ">
 
+              {/* Stress */}
+
               <div className="
 
-                px-4 py-2
+                rounded-3xl
 
-                rounded-2xl
+                p-6
 
-                bg-black/[0.04]
-                dark:bg-white/[0.05]
+                bg-gradient-to-br
 
-                text-sm
+                from-red-500/10
+                to-orange-500/10
+
+                border border-red-500/10
 
               ">
 
-                Stress:
-                {' '}
-                {entry.stress_level}
+                <div className="
+
+                  flex items-center gap-3
+
+                  mb-5
+
+                ">
+
+                  <div className="
+
+                    w-12 h-12
+
+                    rounded-2xl
+
+                    flex items-center justify-center
+
+                    bg-red-500/20
+
+                  ">
+
+                    <Flame
+
+                      size={22}
+
+                      className="text-red-500"
+
+                    />
+
+                  </div>
+
+                  <div>
+
+                    <p className="
+
+                      text-sm
+
+                      text-[var(--text-secondary)]
+
+                    ">
+
+                      Stress Level
+
+                    </p>
+
+                    <h3 className="
+
+                      text-3xl
+
+                      font-semibold
+
+                    ">
+
+                      {
+
+                        entry.stress_level || 0
+
+                      }
+
+                    </h3>
+
+                  </div>
+
+                </div>
+
+                {/* Progress */}
+
+                <div className="
+
+                  w-full h-2
+
+                  rounded-full
+
+                  overflow-hidden
+
+                  bg-black/[0.05]
+                  dark:bg-white/[0.05]
+
+                ">
+
+                  <motion.div
+
+                    initial={{
+                      width: 0,
+                    }}
+
+                    animate={{
+                      width: `${entry.stress_level || 0}%`,
+                    }}
+
+                    transition={{
+                      duration: 0.8,
+                    }}
+
+                    className="
+
+                      h-full
+
+                      bg-gradient-to-r
+
+                      from-red-500
+                      to-orange-500
+
+                    "
+                  />
+
+                </div>
 
               </div>
 
+              {/* Positivity */}
+
               <div className="
 
-                px-4 py-2
+                rounded-3xl
 
-                rounded-2xl
+                p-6
 
-                bg-black/[0.04]
-                dark:bg-white/[0.05]
+                bg-gradient-to-br
 
-                text-sm
+                from-blue-500/10
+                to-green-500/10
+
+                border border-blue-500/10
 
               ">
 
-                Positivity:
-                {' '}
-                {entry.positivity_score}
+                <div className="
+
+                  flex items-center gap-3
+
+                  mb-5
+
+                ">
+
+                  <div className="
+
+                    w-12 h-12
+
+                    rounded-2xl
+
+                    flex items-center justify-center
+
+                    bg-blue-500/20
+
+                  ">
+
+                    <Heart
+
+                      size={22}
+
+                      className="text-blue-500"
+
+                    />
+
+                  </div>
+
+                  <div>
+
+                    <p className="
+
+                      text-sm
+
+                      text-[var(--text-secondary)]
+
+                    ">
+
+                      Positivity
+
+                    </p>
+
+                    <h3 className="
+
+                      text-3xl
+
+                      font-semibold
+
+                    ">
+
+                      {
+
+                        entry.positivity_score || 0
+
+                      }
+
+                    </h3>
+
+                  </div>
+
+                </div>
+
+                {/* Progress */}
+
+                <div className="
+
+                  w-full h-2
+
+                  rounded-full
+
+                  overflow-hidden
+
+                  bg-black/[0.05]
+                  dark:bg-white/[0.05]
+
+                ">
+
+                  <motion.div
+
+                    initial={{
+                      width: 0,
+                    }}
+
+                    animate={{
+                      width: `${entry.positivity_score || 0}%`,
+                    }}
+
+                    transition={{
+                      duration: 0.8,
+                    }}
+
+                    className="
+
+                      h-full
+
+                      bg-gradient-to-r
+
+                      from-blue-500
+                      to-green-500
+
+                    "
+                  />
+
+                </div>
 
               </div>
 
@@ -401,15 +630,15 @@ export default function TimelinePage() {
 
             {/* Journal */}
 
-            <div className="mb-8">
+            <div className="mb-10">
 
               <h3 className="
 
-                text-lg
+                text-xl
 
-                font-medium
+                font-semibold
 
-                mb-3
+                mb-4
 
               ">
 
@@ -431,17 +660,17 @@ export default function TimelinePage() {
 
             </div>
 
-            {/* Reflection */}
+            {/* AI Reflection */}
 
-            <div className="mb-8">
+            <div className="mb-10">
 
               <h3 className="
 
-                text-lg
+                text-xl
 
-                font-medium
+                font-semibold
 
-                mb-3
+                mb-4
 
               ">
 
@@ -471,11 +700,11 @@ export default function TimelinePage() {
 
               <h3 className="
 
-                text-lg
+                text-xl
 
-                font-medium
+                font-semibold
 
-                mb-3
+                mb-4
 
               ">
 
