@@ -59,31 +59,52 @@ export default function AnalyticsPage() {
     }
   }
 
-  // UNIQUE TIMESTAMP DATA
+  // -------------------------
+  // STABLE UNIQUE GRAPH DATA
+  // -------------------------
 
-  const chartData = entries.map((entry) => ({
+  const chartData = entries.map(
 
-    date:
+    (entry, index) => ({
 
-      new Date(
-        entry.created_at
-      ).toLocaleString([], {
+      id: entry.id,
 
-        month: 'short',
+      index,
 
-        day: 'numeric',
+      fullDate:
 
-        hour: '2-digit',
+        new Date(
+          entry.created_at
+        ).toLocaleString(),
 
-        minute: '2-digit',
-      }),
+      shortDate:
 
-    stress:
-      Number(entry.stress_level) || 0,
+        new Date(
+          entry.created_at
+        ).toLocaleString([], {
 
-    positivity:
-      Number(entry.positivity_score) || 0,
-  }))
+          month: 'short',
+
+          day: 'numeric',
+
+          hour: '2-digit',
+
+          minute: '2-digit',
+
+          second: '2-digit',
+        }),
+
+      stress:
+        Number(entry.stress_level) || 0,
+
+      positivity:
+        Number(entry.positivity_score) || 0,
+    })
+  )
+
+  // -------------------------
+  // AVERAGES
+  // -------------------------
 
   const averageStress =
 
@@ -96,7 +117,9 @@ export default function AnalyticsPage() {
             (acc, curr) =>
 
               acc + (
-                curr.stress_level || 0
+                Number(
+                  curr.stress_level
+                ) || 0
               ),
 
             0
@@ -116,7 +139,9 @@ export default function AnalyticsPage() {
             (acc, curr) =>
 
               acc + (
-                curr.positivity_score || 0
+                Number(
+                  curr.positivity_score
+                ) || 0
               ),
 
             0
@@ -140,7 +165,7 @@ export default function AnalyticsPage() {
       "
     >
 
-      {/* Ambient Glow */}
+      {/* Glow Background */}
 
       <div className="fixed inset-0 -z-10 overflow-hidden">
 
@@ -254,10 +279,9 @@ export default function AnalyticsPage() {
           "
         >
 
-          Visualize emotional patterns,
-          positivity growth,
-          stress fluctuations,
-          and reflective progress over time.
+          Visualize emotional growth,
+          positivity patterns,
+          and mental clarity over time.
 
         </motion.p>
 
@@ -387,7 +411,7 @@ export default function AnalyticsPage() {
 
       <div className="space-y-10">
 
-        {/* Stress Chart */}
+        {/* STRESS */}
 
         <motion.div
 
@@ -487,7 +511,13 @@ export default function AnalyticsPage() {
 
                 <XAxis
 
-                  dataKey="date"
+                  dataKey="index"
+
+                  tickFormatter={(value) =>
+
+                    chartData[value]
+                      ?.shortDate || ''
+                  }
 
                   stroke="#888"
 
@@ -497,18 +527,18 @@ export default function AnalyticsPage() {
 
                 <Tooltip
 
+                  labelFormatter={(value) =>
+
+                    chartData[value]
+                      ?.fullDate
+                  }
+
                   formatter={(value) => [
 
                     `${value}`,
 
+                    'Stress Level',
                   ]}
-
-                  labelStyle={{
-
-                    color: 'white',
-
-                    marginBottom: '8px',
-                  }}
 
                   contentStyle={{
 
@@ -563,7 +593,7 @@ export default function AnalyticsPage() {
 
         </motion.div>
 
-        {/* Positivity Chart */}
+        {/* POSITIVITY */}
 
         <motion.div
 
@@ -626,7 +656,13 @@ export default function AnalyticsPage() {
 
                 <XAxis
 
-                  dataKey="date"
+                  dataKey="index"
+
+                  tickFormatter={(value) =>
+
+                    chartData[value]
+                      ?.shortDate || ''
+                  }
 
                   stroke="#888"
 
@@ -636,18 +672,18 @@ export default function AnalyticsPage() {
 
                 <Tooltip
 
+                  labelFormatter={(value) =>
+
+                    chartData[value]
+                      ?.fullDate
+                  }
+
                   formatter={(value) => [
 
                     `${value}`,
 
+                    'Positivity Score',
                   ]}
-
-                  labelStyle={{
-
-                    color: 'white',
-
-                    marginBottom: '8px',
-                  }}
 
                   contentStyle={{
 
