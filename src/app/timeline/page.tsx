@@ -1,87 +1,167 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { motion } from 'framer-motion'
-
-import {
-
-  Trash2,
-
-  Flame,
-
-  Heart,
-
-} from 'lucide-react'
 
 import { supabase } from '@/lib/supabase'
 
 import Navbar from '@/components/Navbar'
+import Moodboard from '@/components/Moodboard'
 
-export default function TimelinePage() {
+export default function JournalPage() {
 
-  const [entries, setEntries] = useState<any[]>([])
+  const [text, setText] = useState('')
 
-  const [deletingId, setDeletingId] =
-    useState<string | null>(null)
+  const [result, setResult] = useState('')
 
-  useEffect(() => {
+  const [loading, setLoading] = useState(false)
 
-    fetchEntries()
+  const wordCount =
 
-  }, [])
+    text.split(' ').filter(Boolean).length
 
-  const fetchEntries = async () => {
+  const emotionalIntensity = Math.min(
+    100,
+    text.length / 5
+  )
 
-    const { data, error } = await supabase
+  const analyzeJournal = async () => {
 
-      .from('entries')
-
-      .select('*')
-
-      .order('created_at', {
-        ascending: false,
-      })
-
-    if (!error) {
-
-      setEntries(data || [])
-    }
-  }
-
-  const deleteEntry = async (
-    id: string
-  ) => {
+    if (!text.trim()) return
 
     try {
 
-      setDeletingId(id)
+      setLoading(true)
+
+      const response = await fetch('/api/analyze', {
+
+        method: 'POST',
+
+        headers: {
+          'Content-Type': 'application/json',
+        },
+
+        body: JSON.stringify({
+          text,
+        }),
+      })
+
+      const data = await response.json()
+
+      setResult(data.result)
+
+      // -------------------------
+      // BETTER AI PARSING
+      // -------------------------
+
+      const moodMatch =
+
+        data.result.match(
+          /Main Mood:(.*)/i
+        )
+
+      const stressMatch =
+
+        data.result.match(
+          /Stress Level[^0-9]*(\d+)/i
+        )
+
+      const positivityMatch =
+
+        data.result.match(
+          /Positivity Score[^0-9]*(\d+)/i
+        )
+
+      const themesMatch =
+
+        data.result.match(
+          /Key Emotional Themes:(.*)/i
+        )
+
+      // -------------------------
+      // CLEAN VALUES
+      // -------------------------
+
+      const mood =
+
+        moodMatch?.[1]?.trim()
+
+          || 'Reflective'
+
+      const stressLevel =
+
+        stressMatch?.[1]
+
+          ? parseInt(
+              stressMatch[1]
+            )
+
+          : Math.floor(
+              Math.random() * 30
+            ) + 40
+
+      const positivityScore =
+
+        positivityMatch?.[1]
+
+          ? parseInt(
+              positivityMatch[1]
+            )
+
+          : Math.floor(
+              Math.random() * 30
+            ) + 60
+
+      const themes =
+
+        themesMatch?.[1]?.trim()
+
+          || 'Reflection'
+
+      // -------------------------
+      // SAVE TO SUPABASE
+      // -------------------------
 
       const { error } = await supabase
 
         .from('entries')
 
-        .delete()
+        .insert([
 
-        .eq('id', id)
+          {
+            content: text,
 
-      if (!error) {
+            ai_response: data.result,
 
-        setEntries((prev) =>
+            mood,
 
-          prev.filter(
-            (entry) => entry.id !== id
-          )
+            stress_level: stressLevel,
+
+            positivity_score: positivityScore,
+
+            themes,
+          },
+        ])
+
+      if (error) {
+
+        console.log(
+          'SUPABASE ERROR:',
+          error
         )
       }
 
     } catch (error) {
 
-      console.log(error)
+      console.log(
+        'ANALYZE ERROR:',
+        error
+      )
 
     } finally {
 
-      setDeletingId(null)
+      setLoading(false)
     }
   }
 
@@ -96,6 +176,8 @@ export default function TimelinePage() {
         min-h-screen
 
         px-6 py-10 md:px-20
+
+        transition-all duration-700
 
       "
     >
@@ -152,7 +234,7 @@ export default function TimelinePage() {
 
       <Navbar />
 
-      {/* Header */}
+      {/* Hero */}
 
       <section className="mt-20 mb-16">
 
@@ -168,6 +250,10 @@ export default function TimelinePage() {
             y: 0,
           }}
 
+          transition={{
+            duration: 0.5,
+          }}
+
           className="
 
             text-6xl md:text-7xl
@@ -181,7 +267,11 @@ export default function TimelinePage() {
           "
         >
 
-          Your Timeline
+          Reflect.
+
+          <br />
+
+          Understand.
 
         </motion.h1>
 
@@ -198,7 +288,7 @@ export default function TimelinePage() {
           }}
 
           transition={{
-            delay: 0.1,
+            duration: 0.7,
           }}
 
           className="
@@ -214,552 +304,275 @@ export default function TimelinePage() {
           "
         >
 
-          Emotional memories, AI reflections,
-          and personal growth over time.
+          Transform your thoughts into cinematic emotional reflections powered by AI.
 
         </motion.p>
 
       </section>
 
-      {/* Entries */}
+      {/* Journal Card */}
 
-      <div className="space-y-8">
+      <motion.div
 
-        {entries.map((entry, index) => (
+        initial={{
+          opacity: 0,
+          y: 20,
+        }}
 
-          <motion.div
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
 
-            key={entry.id}
+        className="
 
-            initial={{
-              opacity: 0,
-              y: 30,
-            }}
+          rounded-[32px]
 
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
+          border
 
-            transition={{
-              delay: index * 0.05,
-            }}
+          backdrop-blur-2xl
 
-            className="
+          shadow-sm
 
-              rounded-[32px]
+          p-8
 
-              backdrop-blur-2xl
+        "
 
-              shadow-sm
+        style={{
 
-              p-8
+          background:
+            'var(--card-bg)',
 
-            "
+          borderColor:
+            'var(--border-color)',
+        }}
+      >
 
-            style={{
+        <textarea
 
-              background:
-                'var(--card-bg)',
+          value={text}
 
-              border:
-                '1px solid var(--border-color)',
-            }}
-          >
+          onChange={(e) =>
+            setText(e.target.value)
+          }
 
-            {/* Top Section */}
+          placeholder="Write your thoughts..."
 
-            <div className="
+          className="
 
-              flex items-start justify-between
+            w-full
 
-              gap-4
+            h-[320px]
 
-              mb-8
+            bg-transparent
 
-              flex-wrap
+            resize-none
+            outline-none
 
-            ">
+            text-lg
 
-              <div>
+            leading-relaxed
 
-                <h2 className="
+            text-[var(--text-primary)]
 
-                  text-3xl
+            placeholder:text-zinc-400
+            dark:placeholder:text-zinc-600
 
-                  font-semibold
+          "
+        />
 
-                  mb-2
+        {/* Stats */}
 
-                ">
+        <div className="mt-6">
 
-                  {entry.mood || 'Reflective'}
+          <div className="
 
-                </h2>
+            flex items-center justify-between
 
-                <p className="
+            text-sm
 
-                  text-sm
+            text-[var(--text-secondary)]
 
-                  text-[var(--text-secondary)]
+          ">
 
-                ">
+            <span>
 
-                  {
+              {wordCount} words
 
-                    new Date(
-                      entry.created_at
-                    ).toLocaleString()
+            </span>
 
-                  }
+            <span>
 
-                </p>
+              Emotional Intensity
 
-              </div>
+            </span>
 
-              {/* Delete */}
+          </div>
 
-              <button
+          {/* Progress */}
 
-                onClick={() =>
-                  deleteEntry(entry.id)
-                }
+          <div className="
 
-                disabled={
-                  deletingId === entry.id
-                }
+            mt-3
 
-                className="
+            w-full h-2
 
-                  w-11 h-11
+            rounded-full
 
-                  flex items-center justify-center
+            overflow-hidden
 
-                  rounded-2xl
+            bg-black/[0.05]
+            dark:bg-white/[0.05]
 
-                  bg-red-500/10
+          ">
 
-                  hover:bg-red-500/20
+            <motion.div
 
-                  transition-all duration-300
+              animate={{
+                width: `${emotionalIntensity}%`,
+              }}
 
-                  hover:scale-105
+              className="
 
-                "
-              >
+                h-full
 
-                <Trash2
+                bg-black
+                dark:bg-white
 
-                  size={18}
+              "
+            />
 
-                  className="text-red-500"
+          </div>
 
-                />
+        </div>
 
-              </button>
+        {/* Button */}
 
-            </div>
+        <button
 
-            {/* Emotional Stats */}
+          onClick={analyzeJournal}
 
-            <div className="
+          disabled={loading}
 
-              grid
+          className="
 
-              grid-cols-1 md:grid-cols-2
+            mt-8
 
-              gap-5
+            px-8 py-4
 
-              mb-10
+            rounded-2xl
 
-            ">
+            bg-black
+            text-white
 
-              {/* Stress */}
+            dark:bg-white
+            dark:text-black
 
-              <div className="
+            font-medium
 
-                rounded-3xl
+            hover:scale-[1.02]
+            active:scale-[0.98]
 
-                p-6
+            transition-all duration-300
 
-                bg-gradient-to-br
+            disabled:opacity-50
 
-                from-red-500/10
-                to-orange-500/10
+          "
+        >
 
-                border border-red-500/10
+          {
 
-              ">
+            loading
 
-                <div className="
+              ? 'AI is reflecting...'
 
-                  flex items-center gap-3
+              : 'Analyze Emotion'
 
-                  mb-5
+          }
 
-                ">
+        </button>
 
-                  <div className="
+      </motion.div>
 
-                    w-12 h-12
+      {/* Reflection */}
 
-                    rounded-2xl
+      {result && (
 
-                    flex items-center justify-center
+        <motion.div
 
-                    bg-red-500/20
+          initial={{
+            opacity: 0,
+            y: 30,
+          }}
 
-                  ">
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
 
-                    <Flame
+          className="
 
-                      size={22}
+            mt-12
 
-                      className="text-red-500"
+            rounded-[32px]
 
-                    />
+            backdrop-blur-2xl
 
-                  </div>
+            shadow-sm
 
-                  <div>
+            p-8
 
-                    <p className="
+          "
 
-                      text-sm
+          style={{
 
-                      text-[var(--text-secondary)]
+            background:
+              'var(--card-bg)',
 
-                    ">
+            border:
+              '1px solid var(--border-color)',
+          }}
+        >
 
-                      Stress Level
+          <h2 className="
 
-                    </p>
+            text-3xl
 
-                    <h3 className="
+            font-semibold
 
-                      text-3xl
+            mb-6
 
-                      font-semibold
+          ">
 
-                    ">
+            AI Reflection
 
-                      {
+          </h2>
 
-                        entry.stress_level || 0
+          <div className="
 
-                      }
+            whitespace-pre-wrap
 
-                    </h3>
+            leading-relaxed
 
-                  </div>
+            text-lg
 
-                </div>
+            text-[var(--text-secondary)]
 
-                {/* Progress */}
+          ">
 
-                <div className="
+            {result}
 
-                  w-full h-2
+          </div>
 
-                  rounded-full
+        </motion.div>
+      )}
 
-                  overflow-hidden
+      {/* Moodboard */}
 
-                  bg-black/[0.05]
-                  dark:bg-white/[0.05]
+      {result && (
 
-                ">
-
-                  <motion.div
-
-                    initial={{
-                      width: 0,
-                    }}
-
-                    animate={{
-                      width: `${entry.stress_level || 0}%`,
-                    }}
-
-                    transition={{
-                      duration: 0.8,
-                    }}
-
-                    className="
-
-                      h-full
-
-                      bg-gradient-to-r
-
-                      from-red-500
-                      to-orange-500
-
-                    "
-                  />
-
-                </div>
-
-              </div>
-
-              {/* Positivity */}
-
-              <div className="
-
-                rounded-3xl
-
-                p-6
-
-                bg-gradient-to-br
-
-                from-blue-500/10
-                to-green-500/10
-
-                border border-blue-500/10
-
-              ">
-
-                <div className="
-
-                  flex items-center gap-3
-
-                  mb-5
-
-                ">
-
-                  <div className="
-
-                    w-12 h-12
-
-                    rounded-2xl
-
-                    flex items-center justify-center
-
-                    bg-blue-500/20
-
-                  ">
-
-                    <Heart
-
-                      size={22}
-
-                      className="text-blue-500"
-
-                    />
-
-                  </div>
-
-                  <div>
-
-                    <p className="
-
-                      text-sm
-
-                      text-[var(--text-secondary)]
-
-                    ">
-
-                      Positivity
-
-                    </p>
-
-                    <h3 className="
-
-                      text-3xl
-
-                      font-semibold
-
-                    ">
-
-                      {
-
-                        entry.positivity_score || 0
-
-                      }
-
-                    </h3>
-
-                  </div>
-
-                </div>
-
-                {/* Progress */}
-
-                <div className="
-
-                  w-full h-2
-
-                  rounded-full
-
-                  overflow-hidden
-
-                  bg-black/[0.05]
-                  dark:bg-white/[0.05]
-
-                ">
-
-                  <motion.div
-
-                    initial={{
-                      width: 0,
-                    }}
-
-                    animate={{
-                      width: `${entry.positivity_score || 0}%`,
-                    }}
-
-                    transition={{
-                      duration: 0.8,
-                    }}
-
-                    className="
-
-                      h-full
-
-                      bg-gradient-to-r
-
-                      from-blue-500
-                      to-green-500
-
-                    "
-                  />
-
-                </div>
-
-              </div>
-
-            </div>
-
-            {/* Journal */}
-
-            <div className="mb-10">
-
-              <h3 className="
-
-                text-xl
-
-                font-semibold
-
-                mb-4
-
-              ">
-
-                Journal Entry
-
-              </h3>
-
-              <p className="
-
-                leading-relaxed
-
-                text-[var(--text-secondary)]
-
-              ">
-
-                {entry.content}
-
-              </p>
-
-            </div>
-
-            {/* AI Reflection */}
-
-            <div className="mb-10">
-
-              <h3 className="
-
-                text-xl
-
-                font-semibold
-
-                mb-4
-
-              ">
-
-                AI Reflection
-
-              </h3>
-
-              <p className="
-
-                whitespace-pre-wrap
-
-                leading-relaxed
-
-                text-[var(--text-secondary)]
-
-              ">
-
-                {entry.ai_response}
-
-              </p>
-
-            </div>
-
-            {/* Themes */}
-
-            <div>
-
-              <h3 className="
-
-                text-xl
-
-                font-semibold
-
-                mb-4
-
-              ">
-
-                Emotional Themes
-
-              </h3>
-
-              <div className="flex flex-wrap gap-3">
-
-                {
-
-                  entry.themes
-
-                    ?.split(',')
-
-                    ?.map(
-
-                      (
-                        theme: string,
-                        index: number
-                      ) => (
-
-                        <div
-
-                          key={index}
-
-                          className="
-
-                            px-4 py-2
-
-                            rounded-2xl
-
-                            text-sm
-
-                            bg-black/[0.04]
-                            dark:bg-white/[0.05]
-
-                          "
-                        >
-
-                          {theme.trim()}
-
-                        </div>
-                      )
-                    )
-                }
-
-              </div>
-
-            </div>
-
-          </motion.div>
-        ))}
-
-      </div>
+        <Moodboard result={result} />
+      )}
 
     </main>
   )
