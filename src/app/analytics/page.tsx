@@ -8,6 +8,10 @@ import {
 
   ResponsiveContainer,
 
+  AreaChart,
+
+  Area,
+
   LineChart,
 
   Line,
@@ -20,10 +24,6 @@ import {
 
   CartesianGrid,
 
-  AreaChart,
-
-  Area,
-
 } from 'recharts'
 
 import { supabase } from '@/lib/supabase'
@@ -32,7 +32,8 @@ import Navbar from '@/components/Navbar'
 
 export default function AnalyticsPage() {
 
-  const [entries, setEntries] = useState<any[]>([])
+  const [entries, setEntries] =
+    useState<any[]>([])
 
   useEffect(() => {
 
@@ -128,7 +129,7 @@ export default function AnalyticsPage() {
       "
     >
 
-      {/* Ambient Glow */}
+      {/* Glow */}
 
       <div className="fixed inset-0 -z-10 overflow-hidden">
 
@@ -242,14 +243,15 @@ export default function AnalyticsPage() {
           "
         >
 
-          Visualize emotional patterns, stress trends,
-          positivity growth, and reflective progress over time.
+          Visualize emotional growth,
+          positivity patterns,
+          and mental clarity over time.
 
         </motion.p>
 
       </section>
 
-      {/* Premium Circular Stats */}
+      {/* Circular Stats */}
 
       <div className="
 
@@ -263,268 +265,109 @@ export default function AnalyticsPage() {
 
       ">
 
-        {/* Total Entries */}
+        {[
 
-        <motion.div
+          {
+            title: 'Total Entries',
+            value: entries.length,
+            gradient:
+              'from-blue-500/20 to-purple-500/20',
+          },
 
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
+          {
+            title: 'Average Stress',
+            value: averageStress,
+            gradient:
+              'from-red-500/20 to-orange-500/20',
+          },
 
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
+          {
+            title: 'Average Positivity',
+            value: averagePositivity,
+            gradient:
+              'from-blue-500/20 to-green-500/20',
+          },
 
-          className="
+        ].map((card, index) => (
 
-            rounded-[32px]
+          <motion.div
 
-            p-10
+            key={index}
 
-            backdrop-blur-2xl
+            whileHover={{
+              scale: 1.03,
+            }}
 
-            shadow-sm
+            className="
 
-            flex flex-col items-center justify-center
+              rounded-[32px]
 
-          "
+              p-10
 
-          style={{
+              backdrop-blur-2xl
 
-            background:
-              'var(--card-bg)',
+              shadow-sm
 
-            border:
-              '1px solid var(--border-color)',
-          }}
-        >
+              flex flex-col items-center justify-center
 
-          <div className="
+            "
 
-            w-40 h-40
+            style={{
 
-            rounded-full
+              background:
+                'var(--card-bg)',
 
-            flex items-center justify-center
+              border:
+                '1px solid var(--border-color)',
+            }}
+          >
 
-            mb-6
+            <div className={`
 
-            bg-gradient-to-br
+              w-40 h-40
 
-            from-blue-500/20
-            to-purple-500/20
+              rounded-full
 
-            border border-white/10
+              flex items-center justify-center
 
-          ">
+              mb-6
 
-            <h2 className="
+              bg-gradient-to-br
 
-              text-5xl
+              ${card.gradient}
 
-              font-semibold
+              border border-white/10
 
-            ">
+            `}>
 
-              {entries.length}
+              <h2 className="
 
-            </h2>
+                text-5xl
 
-          </div>
+                font-semibold
 
-          <p className="
+              ">
 
-            text-lg
+                {card.value}
 
-            text-[var(--text-secondary)]
+              </h2>
 
-          ">
+            </div>
 
-            Total Entries
+            <p className="
 
-          </p>
+              text-lg
 
-        </motion.div>
-
-        {/* Stress */}
-
-        <motion.div
-
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-
-          transition={{
-            delay: 0.1,
-          }}
-
-          className="
-
-            rounded-[32px]
-
-            p-10
-
-            backdrop-blur-2xl
-
-            shadow-sm
-
-            flex flex-col items-center justify-center
-
-          "
-
-          style={{
-
-            background:
-              'var(--card-bg)',
-
-            border:
-              '1px solid var(--border-color)',
-          }}
-        >
-
-          <div className="
-
-            w-40 h-40
-
-            rounded-full
-
-            flex items-center justify-center
-
-            mb-6
-
-            bg-gradient-to-br
-
-            from-red-500/20
-            to-orange-500/20
-
-            border border-white/10
-
-          ">
-
-            <h2 className="
-
-              text-5xl
-
-              font-semibold
+              text-[var(--text-secondary)]
 
             ">
 
-              {averageStress}
+              {card.title}
 
-            </h2>
+            </p>
 
-          </div>
-
-          <p className="
-
-            text-lg
-
-            text-[var(--text-secondary)]
-
-          ">
-
-            Average Stress
-
-          </p>
-
-        </motion.div>
-
-        {/* Positivity */}
-
-        <motion.div
-
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-
-          transition={{
-            delay: 0.2,
-          }}
-
-          className="
-
-            rounded-[32px]
-
-            p-10
-
-            backdrop-blur-2xl
-
-            shadow-sm
-
-            flex flex-col items-center justify-center
-
-          "
-
-          style={{
-
-            background:
-              'var(--card-bg)',
-
-            border:
-              '1px solid var(--border-color)',
-          }}
-        >
-
-          <div className="
-
-            w-40 h-40
-
-            rounded-full
-
-            flex items-center justify-center
-
-            mb-6
-
-            bg-gradient-to-br
-
-            from-green-500/20
-            to-blue-500/20
-
-            border border-white/10
-
-          ">
-
-            <h2 className="
-
-              text-5xl
-
-              font-semibold
-
-            ">
-
-              {averagePositivity}
-
-            </h2>
-
-          </div>
-
-          <p className="
-
-            text-lg
-
-            text-[var(--text-secondary)]
-
-          ">
-
-            Average Positivity
-
-          </p>
-
-        </motion.div>
+          </motion.div>
+        ))}
 
       </div>
 
@@ -532,18 +375,12 @@ export default function AnalyticsPage() {
 
       <div className="space-y-10">
 
-        {/* Stress Chart */}
+        {/* Stress */}
 
         <motion.div
 
-          initial={{
-            opacity: 0,
-            y: 30,
-          }}
-
-          animate={{
-            opacity: 1,
-            y: 0,
+          whileHover={{
+            scale: 1.01,
           }}
 
           className="
@@ -582,7 +419,7 @@ export default function AnalyticsPage() {
 
           </h2>
 
-          <div className="h-[400px]">
+          <div className="h-[420px]">
 
             <ResponsiveContainer
               width="100%"
@@ -610,7 +447,7 @@ export default function AnalyticsPage() {
 
                       stopColor="#ef4444"
 
-                      stopOpacity={0.4}
+                      stopOpacity={0.5}
 
                     />
 
@@ -637,16 +474,27 @@ export default function AnalyticsPage() {
                 />
 
                 <XAxis
-
                   dataKey="date"
-
                   stroke="#888"
-
                 />
 
                 <YAxis stroke="#888" />
 
-                <Tooltip />
+                <Tooltip
+
+                  contentStyle={{
+
+                    background:
+                      'rgba(15,15,15,0.9)',
+
+                    border:
+                      '1px solid rgba(255,255,255,0.08)',
+
+                    borderRadius: '20px',
+
+                    color: 'white',
+                  }}
+                />
 
                 <Area
 
@@ -658,7 +506,18 @@ export default function AnalyticsPage() {
 
                   fill="url(#stressGradient)"
 
-                  strokeWidth={3}
+                  strokeWidth={4}
+
+                  activeDot={{
+
+                    r: 8,
+
+                    fill: '#ef4444',
+
+                    strokeWidth: 4,
+
+                    stroke: '#fff',
+                  }}
 
                 />
 
@@ -670,22 +529,12 @@ export default function AnalyticsPage() {
 
         </motion.div>
 
-        {/* Positivity Chart */}
+        {/* Positivity */}
 
         <motion.div
 
-          initial={{
-            opacity: 0,
-            y: 30,
-          }}
-
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-
-          transition={{
-            delay: 0.1,
+          whileHover={{
+            scale: 1.01,
           }}
 
           className="
@@ -724,7 +573,7 @@ export default function AnalyticsPage() {
 
           </h2>
 
-          <div className="h-[400px]">
+          <div className="h-[420px]">
 
             <ResponsiveContainer
               width="100%"
@@ -742,16 +591,27 @@ export default function AnalyticsPage() {
                 />
 
                 <XAxis
-
                   dataKey="date"
-
                   stroke="#888"
-
                 />
 
                 <YAxis stroke="#888" />
 
-                <Tooltip />
+                <Tooltip
+
+                  contentStyle={{
+
+                    background:
+                      'rgba(15,15,15,0.9)',
+
+                    border:
+                      '1px solid rgba(255,255,255,0.08)',
+
+                    borderRadius: '20px',
+
+                    color: 'white',
+                  }}
+                />
 
                 <Line
 
@@ -764,6 +624,17 @@ export default function AnalyticsPage() {
                   strokeWidth={4}
 
                   dot={false}
+
+                  activeDot={{
+
+                    r: 8,
+
+                    fill: '#3b82f6',
+
+                    strokeWidth: 4,
+
+                    stroke: '#fff',
+                  }}
 
                 />
 

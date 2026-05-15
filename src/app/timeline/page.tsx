@@ -2,11 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
-import {
-
-  motion,
-
-} from 'framer-motion'
+import { motion } from 'framer-motion'
 
 import {
 
@@ -104,7 +100,7 @@ export default function TimelinePage() {
       "
     >
 
-      {/* Glow */}
+      {/* Ambient Glow */}
 
       <div className="fixed inset-0 -z-10 overflow-hidden">
 
@@ -218,14 +214,14 @@ export default function TimelinePage() {
           "
         >
 
-          Emotional memories, reflections,
-          and personal growth through time.
+          Emotional memories, AI reflections,
+          and personal growth over time.
 
         </motion.p>
 
       </section>
 
-      {/* Timeline */}
+      {/* Entries */}
 
       <div className="space-y-8">
 
@@ -245,12 +241,7 @@ export default function TimelinePage() {
               y: 0,
             }}
 
-            whileHover={{
-              scale: 1.01,
-            }}
-
             transition={{
-              duration: 0.3,
               delay: index * 0.05,
             }}
 
@@ -276,15 +267,17 @@ export default function TimelinePage() {
             }}
           >
 
-            {/* Header */}
+            {/* Top Section */}
 
             <div className="
 
               flex items-start justify-between
 
+              gap-4
+
               mb-8
 
-              gap-4
+              flex-wrap
 
             ">
 
@@ -300,7 +293,7 @@ export default function TimelinePage() {
 
                 ">
 
-                  {entry.mood}
+                  {entry.mood || 'Reflective'}
 
                 </h2>
 
@@ -340,17 +333,17 @@ export default function TimelinePage() {
 
                   w-11 h-11
 
-                  rounded-2xl
-
                   flex items-center justify-center
+
+                  rounded-2xl
 
                   bg-red-500/10
 
                   hover:bg-red-500/20
 
-                  hover:scale-110
-
                   transition-all duration-300
+
+                  hover:scale-105
 
                 "
               >
@@ -367,7 +360,7 @@ export default function TimelinePage() {
 
             </div>
 
-            {/* Stats */}
+            {/* Emotional Stats */}
 
             <div className="
 
@@ -375,7 +368,7 @@ export default function TimelinePage() {
 
               grid-cols-1 md:grid-cols-2
 
-              gap-6
+              gap-5
 
               mb-10
 
@@ -383,55 +376,44 @@ export default function TimelinePage() {
 
               {/* Stress */}
 
-              <motion.div
+              <div className="
 
-                whileHover={{
-                  scale: 1.03,
-                }}
+                rounded-3xl
 
-                className="
+                p-6
 
-                  rounded-[30px]
+                bg-gradient-to-br
 
-                  p-7
+                from-red-500/10
+                to-orange-500/10
 
-                  overflow-hidden
+                border border-red-500/10
 
-                  relative
-
-                  bg-gradient-to-br
-
-                  from-red-500/10
-                  to-orange-500/10
-
-                  border border-red-500/10
-
-                "
-              >
+              ">
 
                 <div className="
 
-                  flex items-center gap-4
+                  flex items-center gap-3
 
-                  mb-6
+                  mb-5
 
                 ">
 
                   <div className="
 
-                    w-14 h-14
+                    w-12 h-12
 
                     rounded-2xl
 
                     flex items-center justify-center
 
-                    bg-red-500/15
+                    bg-red-500/20
 
                   ">
 
                     <Flame
 
-                      size={24}
+                      size={22}
 
                       className="text-red-500"
 
@@ -455,7 +437,7 @@ export default function TimelinePage() {
 
                     <h3 className="
 
-                      text-4xl
+                      text-3xl
 
                       font-semibold
 
@@ -477,7 +459,7 @@ export default function TimelinePage() {
 
                 <div className="
 
-                  w-full h-3
+                  w-full h-2
 
                   rounded-full
 
@@ -490,29 +472,21 @@ export default function TimelinePage() {
 
                   <motion.div
 
-                    whileHover={{
-                      filter:
-                        'brightness(1.2)',
-                    }}
-
                     initial={{
                       width: 0,
                     }}
 
                     animate={{
-                      width:
-                        `${entry.stress_level}%`,
+                      width: `${entry.stress_level || 0}%`,
                     }}
 
                     transition={{
-                      duration: 1,
+                      duration: 0.8,
                     }}
 
                     className="
 
                       h-full
-
-                      rounded-full
 
                       bg-gradient-to-r
 
@@ -524,59 +498,48 @@ export default function TimelinePage() {
 
                 </div>
 
-              </motion.div>
+              </div>
 
               {/* Positivity */}
 
-              <motion.div
+              <div className="
 
-                whileHover={{
-                  scale: 1.03,
-                }}
+                rounded-3xl
 
-                className="
+                p-6
 
-                  rounded-[30px]
+                bg-gradient-to-br
 
-                  p-7
+                from-blue-500/10
+                to-green-500/10
 
-                  overflow-hidden
+                border border-blue-500/10
 
-                  relative
-
-                  bg-gradient-to-br
-
-                  from-blue-500/10
-                  to-green-500/10
-
-                  border border-blue-500/10
-
-                "
-              >
+              ">
 
                 <div className="
 
-                  flex items-center gap-4
+                  flex items-center gap-3
 
-                  mb-6
+                  mb-5
 
                 ">
 
                   <div className="
 
-                    w-14 h-14
+                    w-12 h-12
 
                     rounded-2xl
 
                     flex items-center justify-center
 
-                    bg-blue-500/15
+                    bg-blue-500/20
 
                   ">
 
                     <Heart
 
-                      size={24}
+                      size={22}
 
                       className="text-blue-500"
 
@@ -600,7 +563,7 @@ export default function TimelinePage() {
 
                     <h3 className="
 
-                      text-4xl
+                      text-3xl
 
                       font-semibold
 
@@ -622,7 +585,7 @@ export default function TimelinePage() {
 
                 <div className="
 
-                  w-full h-3
+                  w-full h-2
 
                   rounded-full
 
@@ -635,29 +598,21 @@ export default function TimelinePage() {
 
                   <motion.div
 
-                    whileHover={{
-                      filter:
-                        'brightness(1.2)',
-                    }}
-
                     initial={{
                       width: 0,
                     }}
 
                     animate={{
-                      width:
-                        `${entry.positivity_score}%`,
+                      width: `${entry.positivity_score || 0}%`,
                     }}
 
                     transition={{
-                      duration: 1,
+                      duration: 0.8,
                     }}
 
                     className="
 
                       h-full
-
-                      rounded-full
 
                       bg-gradient-to-r
 
@@ -669,7 +624,7 @@ export default function TimelinePage() {
 
                 </div>
 
-              </motion.div>
+              </div>
 
             </div>
 
@@ -705,7 +660,7 @@ export default function TimelinePage() {
 
             </div>
 
-            {/* Reflection */}
+            {/* AI Reflection */}
 
             <div className="mb-10">
 
