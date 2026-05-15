@@ -1,18 +1,30 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
-import Navbar from '@/components/Navbar'
+
+import { motion } from 'framer-motion'
 
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
+
   ResponsiveContainer,
+
+  LineChart,
+
+  Line,
+
+  XAxis,
+
+  YAxis,
+
+  Tooltip,
+
   CartesianGrid,
+
 } from 'recharts'
+
+import { supabase } from '@/lib/supabase'
+
+import Navbar from '@/components/Navbar'
 
 export default function AnalyticsPage() {
 
@@ -44,60 +56,256 @@ export default function AnalyticsPage() {
 
   const chartData = entries.map((entry) => ({
 
-    date: new Date(entry.created_at)
-      .toLocaleDateString(),
+    date:
 
-    stress: entry.stress_level,
+      new Date(
+        entry.created_at
+      ).toLocaleDateString(),
 
-    positivity: entry.positivity_score,
+    stress:
+      entry.stress_level,
+
+    positivity:
+      entry.positivity_score,
   }))
+
+  const averageStress =
+
+    entries.length > 0
+
+      ? Math.round(
+
+          entries.reduce(
+
+            (acc, curr) =>
+
+              acc + (
+                curr.stress_level || 0
+              ),
+
+            0
+          ) / entries.length
+        )
+
+      : 0
+
+  const averagePositivity =
+
+    entries.length > 0
+
+      ? Math.round(
+
+          entries.reduce(
+
+            (acc, curr) =>
+
+              acc + (
+                curr.positivity_score || 0
+              ),
+
+            0
+          ) / entries.length
+        )
+
+      : 0
 
   return (
 
-    <main className="relative overflow-hidden min-h-screen bg-gradient-to-b from-black via-zinc-950 to-zinc-900 text-white px-8 py-12 md:px-20">
+    <main
+
+      className="
+
+        relative
+
+        min-h-screen
+
+        px-6 py-10 md:px-20
+
+      "
+    >
 
       {/* Glow */}
 
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
+      <div className="fixed inset-0 -z-10 overflow-hidden">
 
-        <div className="absolute top-20 left-20 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl" />
+        <div
 
-        <div className="absolute bottom-20 right-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl" />
+          className="
+
+            absolute
+
+            top-[-120px]
+            left-[-120px]
+
+            w-[400px]
+            h-[400px]
+
+            rounded-full
+
+            bg-blue-400/20
+            dark:bg-blue-500/10
+
+            blur-3xl
+
+          "
+        />
+
+        <div
+
+          className="
+
+            absolute
+
+            bottom-[-120px]
+            right-[-120px]
+
+            w-[400px]
+            h-[400px]
+
+            rounded-full
+
+            bg-purple-400/20
+            dark:bg-purple-500/10
+
+            blur-3xl
+
+          "
+        />
 
       </div>
 
       <Navbar />
 
-      <div className="mt-10 mb-16">
+      {/* Header */}
 
-        <h1 className="text-6xl font-bold tracking-tight mb-6">
+      <section className="mt-20 mb-16">
+
+        <motion.h1
+
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+
+          className="
+
+            text-6xl md:text-7xl
+
+            font-semibold
+
+            tracking-tight
+
+            mb-6
+
+          "
+        >
 
           Emotional Analytics
 
-        </h1>
+        </motion.h1>
 
-        <p className="text-zinc-400 text-lg max-w-2xl">
+        <motion.p
 
-          Visualize your emotional growth,
-          stress patterns, and positivity trends over time.
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
 
-        </p>
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
 
-      </div>
+          transition={{
+            delay: 0.1,
+          }}
+
+          className="
+
+            text-xl
+
+            max-w-2xl
+
+            leading-relaxed
+
+            text-[var(--text-secondary)]
+
+          "
+        >
+
+          Visualize emotional patterns, positivity trends,
+          stress levels, and reflective growth over time.
+
+        </motion.p>
+
+      </section>
 
       {/* Stats */}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+      <div className="
 
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-xl">
+        grid
 
-          <p className="text-zinc-500 mb-3">
+        grid-cols-1 md:grid-cols-3
+
+        gap-6
+
+        mb-12
+
+      ">
+
+        {/* Total Entries */}
+
+        <div
+
+          className="
+
+            rounded-[32px]
+
+            p-8
+
+            backdrop-blur-2xl
+
+            shadow-sm
+
+          "
+
+          style={{
+
+            background:
+              'var(--card-bg)',
+
+            border:
+              '1px solid var(--border-color)',
+          }}
+        >
+
+          <p className="
+
+            text-sm
+
+            mb-4
+
+            text-[var(--text-secondary)]
+
+          ">
 
             Total Entries
 
           </p>
 
-          <h2 className="text-5xl font-bold">
+          <h2 className="
+
+            text-5xl
+
+            font-semibold
+
+          ">
 
             {entries.length}
 
@@ -105,69 +313,109 @@ export default function AnalyticsPage() {
 
         </div>
 
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-xl">
+        {/* Stress */}
 
-          <p className="text-zinc-500 mb-3">
+        <div
+
+          className="
+
+            rounded-[32px]
+
+            p-8
+
+            backdrop-blur-2xl
+
+            shadow-sm
+
+          "
+
+          style={{
+
+            background:
+              'var(--card-bg)',
+
+            border:
+              '1px solid var(--border-color)',
+          }}
+        >
+
+          <p className="
+
+            text-sm
+
+            mb-4
+
+            text-[var(--text-secondary)]
+
+          ">
 
             Average Stress
 
           </p>
 
-          <h2 className="text-5xl font-bold">
+          <h2 className="
 
-            {
+            text-5xl
 
-              entries.length > 0
+            font-semibold
 
-                ? Math.round(
+          ">
 
-                    entries.reduce(
-
-                      (acc, curr) =>
-
-                        acc + (curr.stress_level || 0),
-
-                      0
-                    ) / entries.length
-                  )
-
-                : 0
-
-            }
+            {averageStress}
 
           </h2>
 
         </div>
 
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-xl">
+        {/* Positivity */}
 
-          <p className="text-zinc-500 mb-3">
+        <div
+
+          className="
+
+            rounded-[32px]
+
+            p-8
+
+            backdrop-blur-2xl
+
+            shadow-sm
+
+          "
+
+          style={{
+
+            background:
+              'var(--card-bg)',
+
+            border:
+              '1px solid var(--border-color)',
+          }}
+        >
+
+          <p className="
+
+            text-sm
+
+            mb-4
+
+            text-[var(--text-secondary)]
+
+          ">
 
             Average Positivity
 
           </p>
 
-          <h2 className="text-5xl font-bold">
+          <h2 className="
 
-            {
+            text-5xl
 
-              entries.length > 0
+            font-semibold
 
-                ? Math.round(
+          ">
 
-                    entries.reduce(
-
-                      (acc, curr) =>
-
-                        acc + (curr.positivity_score || 0),
-
-                      0
-                    ) / entries.length
-                  )
-
-                : 0
-
-            }
+            {averagePositivity}
 
           </h2>
 
@@ -177,13 +425,43 @@ export default function AnalyticsPage() {
 
       {/* Charts */}
 
-      <div className="space-y-12">
+      <div className="space-y-10">
 
         {/* Stress Chart */}
 
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-xl">
+        <div
 
-          <h2 className="text-3xl font-semibold mb-8">
+          className="
+
+            rounded-[32px]
+
+            p-8
+
+            backdrop-blur-2xl
+
+            shadow-sm
+
+          "
+
+          style={{
+
+            background:
+              'var(--card-bg)',
+
+            border:
+              '1px solid var(--border-color)',
+          }}
+        >
+
+          <h2 className="
+
+            text-3xl
+
+            font-semibold
+
+            mb-8
+
+          ">
 
             Stress Trend
 
@@ -191,23 +469,39 @@ export default function AnalyticsPage() {
 
           <div className="h-[400px]">
 
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+            >
 
               <LineChart data={chartData}>
 
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="rgba(120,120,120,0.15)"
+                />
 
-                <XAxis dataKey="date" stroke="#71717a" />
+                <XAxis
+                  dataKey="date"
+                  stroke="#888"
+                />
 
-                <YAxis stroke="#71717a" />
+                <YAxis stroke="#888" />
 
                 <Tooltip />
 
                 <Line
+
                   type="monotone"
+
                   dataKey="stress"
-                  stroke="#a855f7"
+
+                  stroke="#8b5cf6"
+
                   strokeWidth={3}
+
+                  dot={false}
+
                 />
 
               </LineChart>
@@ -220,9 +514,39 @@ export default function AnalyticsPage() {
 
         {/* Positivity Chart */}
 
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-xl">
+        <div
 
-          <h2 className="text-3xl font-semibold mb-8">
+          className="
+
+            rounded-[32px]
+
+            p-8
+
+            backdrop-blur-2xl
+
+            shadow-sm
+
+          "
+
+          style={{
+
+            background:
+              'var(--card-bg)',
+
+            border:
+              '1px solid var(--border-color)',
+          }}
+        >
+
+          <h2 className="
+
+            text-3xl
+
+            font-semibold
+
+            mb-8
+
+          ">
 
             Positivity Trend
 
@@ -230,23 +554,39 @@ export default function AnalyticsPage() {
 
           <div className="h-[400px]">
 
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+            >
 
               <LineChart data={chartData}>
 
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="rgba(120,120,120,0.15)"
+                />
 
-                <XAxis dataKey="date" stroke="#71717a" />
+                <XAxis
+                  dataKey="date"
+                  stroke="#888"
+                />
 
-                <YAxis stroke="#71717a" />
+                <YAxis stroke="#888" />
 
                 <Tooltip />
 
                 <Line
+
                   type="monotone"
+
                   dataKey="positivity"
+
                   stroke="#3b82f6"
+
                   strokeWidth={3}
+
+                  dot={false}
+
                 />
 
               </LineChart>

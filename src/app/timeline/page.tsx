@@ -1,14 +1,16 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+
 import { motion } from 'framer-motion'
+
+import { supabase } from '@/lib/supabase'
+
 import Navbar from '@/components/Navbar'
 
 export default function TimelinePage() {
 
   const [entries, setEntries] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
 
@@ -18,109 +20,162 @@ export default function TimelinePage() {
 
   const fetchEntries = async () => {
 
-    try {
+    const { data, error } = await supabase
 
-      const { data, error } = await supabase
+      .from('entries')
 
-        .from('entries')
+      .select('*')
 
-        .select('*')
+      .order('created_at', {
+        ascending: false,
+      })
 
-        .order('created_at', {
-          ascending: false,
-        })
+    if (!error) {
 
-      if (error) {
-
-        console.log(error)
-
-      } else {
-
-        setEntries(data || [])
-      }
-
-    } catch (error) {
-
-      console.log(error)
-
-    } finally {
-
-      setLoading(false)
+      setEntries(data || [])
     }
   }
 
   return (
 
-    <main className="relative overflow-hidden min-h-screen bg-gradient-to-b from-black via-zinc-950 to-zinc-900 text-white px-8 py-12 md:px-20">
+    <main
 
-      {/* Background Glow Effects */}
+      className="
 
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
+        relative
 
-        <div className="absolute top-20 left-20 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl" />
+        min-h-screen
 
-        <div className="absolute bottom-20 right-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl" />
+        px-6 py-10 md:px-20
+
+        transition-all duration-700
+
+      "
+    >
+
+      {/* Glow Background */}
+
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+
+        <div
+
+          className="
+
+            absolute
+
+            top-[-120px]
+            left-[-120px]
+
+            w-[400px]
+            h-[400px]
+
+            rounded-full
+
+            bg-blue-400/20
+            dark:bg-blue-500/10
+
+            blur-3xl
+
+          "
+        />
+
+        <div
+
+          className="
+
+            absolute
+
+            bottom-[-120px]
+            right-[-120px]
+
+            w-[400px]
+            h-[400px]
+
+            rounded-full
+
+            bg-purple-400/20
+            dark:bg-purple-500/10
+
+            blur-3xl
+
+          "
+        />
 
       </div>
-
-      {/* Navbar */}
 
       <Navbar />
 
-      {/* Page Heading */}
+      {/* Header */}
 
-      <div className="mb-16 mt-10">
+      <section className="mt-20 mb-16">
 
-        <h1 className="text-6xl md:text-7xl font-bold tracking-tight mb-6">
+        <motion.h1
 
-          Timeline
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
 
-        </h1>
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
 
-        <p className="text-zinc-400 text-lg max-w-2xl leading-relaxed">
+          className="
 
-          Explore your emotional memories, reflections,
-          and cinematic AI insights over time.
+            text-6xl md:text-7xl
 
-        </p>
+            font-semibold
 
-      </div>
+            tracking-tight
 
-      {/* Loading State */}
+            mb-6
 
-      {loading && (
+          "
+        >
 
-        <div className="text-zinc-500 text-lg">
+          Your Timeline
 
-          Loading memories...
+        </motion.h1>
 
-        </div>
-      )}
+        <motion.p
 
-      {/* Empty State */}
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
 
-      {!loading && entries.length === 0 && (
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
 
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-10 backdrop-blur-xl">
+          transition={{
+            delay: 0.1,
+          }}
 
-          <h2 className="text-2xl font-semibold mb-4">
+          className="
 
-            No Journal Entries Yet
+            text-xl
 
-          </h2>
+            max-w-2xl
 
-          <p className="text-zinc-400">
+            leading-relaxed
 
-            Start writing in your journal to build your emotional timeline.
+            text-[var(--text-secondary)]
 
-          </p>
+          "
+        >
 
-        </div>
-      )}
+          A cinematic archive of your emotions, reflections, and personal growth.
 
-      {/* Timeline Entries */}
+        </motion.p>
 
-      <div className="space-y-10">
+      </section>
+
+      {/* Timeline */}
+
+      <div className="space-y-8">
 
         {entries.map((entry, index) => (
 
@@ -128,46 +183,161 @@ export default function TimelinePage() {
 
             key={entry.id}
 
-            initial={{ opacity: 0, y: 30 }}
-
-            animate={{ opacity: 1, y: 0 }}
-
-            transition={{
-              duration: 0.5,
-              delay: index * 0.1,
+            initial={{
+              opacity: 0,
+              y: 30,
             }}
 
-            className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl"
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
 
+            transition={{
+              delay: index * 0.05,
+            }}
+
+            className="
+
+              rounded-[32px]
+
+              backdrop-blur-2xl
+
+              shadow-sm
+
+              p-8
+
+            "
+
+            style={{
+
+              background:
+                'var(--card-bg)',
+
+              border:
+                '1px solid var(--border-color)',
+            }}
           >
 
-            {/* Date */}
+            {/* Top Row */}
 
-            <p className="text-zinc-500 text-sm mb-6">
+            <div className="
 
-              {new Date(entry.created_at).toLocaleString()}
+              flex items-center justify-between
 
-            </p>
+              mb-6
 
-            {/* Mood Badge */}
+              flex-wrap gap-4
 
-            <div className="inline-block px-4 py-2 rounded-full bg-white/10 border border-white/10 text-sm mb-6">
+            ">
 
-              {entry.mood}
+              <div>
+
+                <h2 className="
+
+                  text-2xl
+
+                  font-semibold
+
+                  mb-2
+
+                ">
+
+                  {entry.mood || 'Reflective'}
+
+                </h2>
+
+                <p className="
+
+                  text-sm
+
+                  text-[var(--text-secondary)]
+
+                ">
+
+                  {
+
+                    new Date(
+                      entry.created_at
+                    ).toLocaleString()
+
+                  }
+
+                </p>
+
+              </div>
+
+              {/* Scores */}
+
+              <div className="flex gap-3">
+
+                <div className="
+
+                  px-4 py-2
+
+                  rounded-2xl
+
+                  text-sm
+
+                  bg-black/[0.04]
+                  dark:bg-white/[0.05]
+
+                ">
+
+                  Stress:
+                  {' '}
+                  {entry.stress_level}
+
+                </div>
+
+                <div className="
+
+                  px-4 py-2
+
+                  rounded-2xl
+
+                  text-sm
+
+                  bg-black/[0.04]
+                  dark:bg-white/[0.05]
+
+                ">
+
+                  Positivity:
+                  {' '}
+                  {entry.positivity_score}
+
+                </div>
+
+              </div>
 
             </div>
 
-            {/* Journal Content */}
+            {/* Journal */}
 
             <div className="mb-8">
 
-              <h2 className="text-2xl font-semibold mb-4">
+              <h3 className="
+
+                text-lg
+
+                font-medium
+
+                mb-3
+
+              ">
 
                 Journal Entry
 
-              </h2>
+              </h3>
 
-              <p className="text-zinc-300 leading-relaxed whitespace-pre-wrap">
+              <p className="
+
+                leading-relaxed
+
+                text-[var(--text-secondary)]
+
+              ">
 
                 {entry.content}
 
@@ -177,15 +347,31 @@ export default function TimelinePage() {
 
             {/* AI Reflection */}
 
-            <div className="border-t border-white/10 pt-8">
+            <div className="mb-8">
 
-              <h3 className="text-xl font-medium mb-4">
+              <h3 className="
+
+                text-lg
+
+                font-medium
+
+                mb-3
+
+              ">
 
                 AI Reflection
 
               </h3>
 
-              <p className="text-zinc-400 leading-relaxed whitespace-pre-wrap">
+              <p className="
+
+                whitespace-pre-wrap
+
+                leading-relaxed
+
+                text-[var(--text-secondary)]
+
+              ">
 
                 {entry.ai_response}
 
@@ -193,61 +379,63 @@ export default function TimelinePage() {
 
             </div>
 
-            {/* Analytics Row */}
+            {/* Themes */}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+            <div>
 
-              {/* Stress */}
+              <h3 className="
 
-              <div className="bg-white/5 rounded-2xl p-5 border border-white/10">
+                text-lg
 
-                <p className="text-zinc-500 text-sm mb-2">
+                font-medium
 
-                  Stress Level
+                mb-3
 
-                </p>
+              ">
 
-                <h4 className="text-3xl font-bold">
+                Emotional Themes
 
-                  {entry.stress_level || '--'}
+              </h3>
 
-                </h4>
+              <div className="flex flex-wrap gap-3">
 
-              </div>
+                {
 
-              {/* Positivity */}
+                  entry.themes
 
-              <div className="bg-white/5 rounded-2xl p-5 border border-white/10">
+                    ?.split(',')
 
-                <p className="text-zinc-500 text-sm mb-2">
+                    ?.map(
 
-                  Positivity
+                      (
+                        theme: string,
+                        index: number
+                      ) => (
 
-                </p>
+                        <div
 
-                <h4 className="text-3xl font-bold">
+                          key={index}
 
-                  {entry.positivity_score || '--'}
+                          className="
 
-                </h4>
+                            px-4 py-2
 
-              </div>
+                            rounded-2xl
 
-              {/* Themes */}
+                            text-sm
 
-              <div className="bg-white/5 rounded-2xl p-5 border border-white/10">
+                            bg-black/[0.04]
+                            dark:bg-white/[0.05]
 
-                <p className="text-zinc-500 text-sm mb-2">
+                          "
+                        >
 
-                  Themes
+                          {theme.trim()}
 
-                </p>
-
-                <h4 className="text-lg font-medium text-zinc-300">
-
-                  {entry.themes || 'Reflection'}
-
-                </h4>
+                        </div>
+                      )
+                    )
+                }
 
               </div>
 
@@ -255,6 +443,7 @@ export default function TimelinePage() {
 
           </motion.div>
         ))}
+
       </div>
 
     </main>
