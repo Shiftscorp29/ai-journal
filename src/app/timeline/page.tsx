@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 
 import { motion } from 'framer-motion'
 
+import { Trash2 } from 'lucide-react'
+
 import { supabase } from '@/lib/supabase'
 
 import Navbar from '@/components/Navbar'
@@ -11,6 +13,9 @@ import Navbar from '@/components/Navbar'
 export default function TimelinePage() {
 
   const [entries, setEntries] = useState<any[]>([])
+
+  const [deletingId, setDeletingId] =
+    useState<string | null>(null)
 
   useEffect(() => {
 
@@ -36,6 +41,42 @@ export default function TimelinePage() {
     }
   }
 
+  const deleteEntry = async (
+    id: string
+  ) => {
+
+    try {
+
+      setDeletingId(id)
+
+      const { error } = await supabase
+
+        .from('entries')
+
+        .delete()
+
+        .eq('id', id)
+
+      if (!error) {
+
+        setEntries((prev) =>
+
+          prev.filter(
+            (entry) => entry.id !== id
+          )
+        )
+      }
+
+    } catch (error) {
+
+      console.log(error)
+
+    } finally {
+
+      setDeletingId(null)
+    }
+  }
+
   return (
 
     <main
@@ -48,12 +89,10 @@ export default function TimelinePage() {
 
         px-6 py-10 md:px-20
 
-        transition-all duration-700
-
       "
     >
 
-      {/* Glow Background */}
+      {/* Glow */}
 
       <div className="fixed inset-0 -z-10 overflow-hidden">
 
@@ -167,13 +206,13 @@ export default function TimelinePage() {
           "
         >
 
-          A cinematic archive of your emotions, reflections, and personal growth.
+          Your emotional memories, reflections, and AI insights.
 
         </motion.p>
 
       </section>
 
-      {/* Timeline */}
+      {/* Entries */}
 
       <div className="space-y-8">
 
@@ -219,15 +258,15 @@ export default function TimelinePage() {
             }}
           >
 
-            {/* Top Row */}
+            {/* Top */}
 
             <div className="
 
-              flex items-center justify-between
+              flex items-start justify-between
+
+              gap-4
 
               mb-6
-
-              flex-wrap gap-4
 
             ">
 
@@ -243,7 +282,7 @@ export default function TimelinePage() {
 
                 ">
 
-                  {entry.mood || 'Reflective'}
+                  {entry.mood}
 
                 </h2>
 
@@ -267,47 +306,94 @@ export default function TimelinePage() {
 
               </div>
 
-              {/* Scores */}
+              {/* Delete Button */}
 
-              <div className="flex gap-3">
+              <button
 
-                <div className="
+                onClick={() =>
+                  deleteEntry(entry.id)
+                }
 
-                  px-4 py-2
+                disabled={
+                  deletingId === entry.id
+                }
 
-                  rounded-2xl
+                className="
 
-                  text-sm
+                  w-11 h-11
 
-                  bg-black/[0.04]
-                  dark:bg-white/[0.05]
-
-                ">
-
-                  Stress:
-                  {' '}
-                  {entry.stress_level}
-
-                </div>
-
-                <div className="
-
-                  px-4 py-2
+                  flex items-center justify-center
 
                   rounded-2xl
 
-                  text-sm
+                  bg-red-500/10
 
-                  bg-black/[0.04]
-                  dark:bg-white/[0.05]
+                  hover:bg-red-500/20
 
-                ">
+                  transition-all duration-300
 
-                  Positivity:
-                  {' '}
-                  {entry.positivity_score}
+                  hover:scale-105
 
-                </div>
+                "
+              >
+
+                <Trash2
+
+                  size={18}
+
+                  className="text-red-500"
+
+                />
+
+              </button>
+
+            </div>
+
+            {/* Stats */}
+
+            <div className="
+
+              flex flex-wrap gap-3
+
+              mb-8
+
+            ">
+
+              <div className="
+
+                px-4 py-2
+
+                rounded-2xl
+
+                bg-black/[0.04]
+                dark:bg-white/[0.05]
+
+                text-sm
+
+              ">
+
+                Stress:
+                {' '}
+                {entry.stress_level}
+
+              </div>
+
+              <div className="
+
+                px-4 py-2
+
+                rounded-2xl
+
+                bg-black/[0.04]
+                dark:bg-white/[0.05]
+
+                text-sm
+
+              ">
+
+                Positivity:
+                {' '}
+                {entry.positivity_score}
 
               </div>
 
@@ -345,7 +431,7 @@ export default function TimelinePage() {
 
             </div>
 
-            {/* AI Reflection */}
+            {/* Reflection */}
 
             <div className="mb-8">
 
