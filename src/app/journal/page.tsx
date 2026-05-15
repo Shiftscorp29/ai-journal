@@ -52,7 +52,7 @@ export default function JournalPage() {
       setResult(data.result)
 
       // -------------------------
-      // BETTER AI PARSING
+      // AI PARSING
       // -------------------------
 
       const moodMatch =
@@ -73,10 +73,12 @@ export default function JournalPage() {
           /Positivity Score[^0-9]*(\d+)/i
         )
 
+      // FIXED THEMES REGEX
+
       const themesMatch =
 
         data.result.match(
-          /Key Emotional Themes:(.*)/i
+          /Key Emotional Themes:\s*([\s\S]*?)(?:\n\n|$)/i
         )
 
       // -------------------------
@@ -113,11 +115,17 @@ export default function JournalPage() {
               Math.random() * 30
             ) + 60
 
+      // FIXED THEMES VALUE
+
       const themes =
 
-        themesMatch?.[1]?.trim()
+        themesMatch?.[1]
 
-          || 'Reflection'
+          ?.replace(/\n/g, '')
+
+          ?.trim()
+
+          || 'growth, reflection'
 
       // -------------------------
       // SAVE TO SUPABASE

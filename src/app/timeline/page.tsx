@@ -20,7 +20,8 @@ import Navbar from '@/components/Navbar'
 
 export default function TimelinePage() {
 
-  const [entries, setEntries] = useState<any[]>([])
+  const [entries, setEntries] =
+    useState<any[]>([])
 
   const [deletingId, setDeletingId] =
     useState<string | null>(null)
@@ -70,7 +71,8 @@ export default function TimelinePage() {
         setEntries((prev) =>
 
           prev.filter(
-            (entry) => entry.id !== id
+            (entry) =>
+              entry.id !== id
           )
         )
       }
@@ -100,7 +102,7 @@ export default function TimelinePage() {
       "
     >
 
-      {/* Ambient Glow */}
+      {/* Glow */}
 
       <div className="fixed inset-0 -z-10 overflow-hidden">
 
@@ -214,14 +216,13 @@ export default function TimelinePage() {
           "
         >
 
-          Emotional memories, AI reflections,
-          and personal growth over time.
+          Emotional reflections and personal growth captured through time.
 
         </motion.p>
 
       </section>
 
-      {/* Entries */}
+      {/* Timeline */}
 
       <div className="space-y-8">
 
@@ -241,7 +242,12 @@ export default function TimelinePage() {
               y: 0,
             }}
 
+            whileHover={{
+              scale: 1.01,
+            }}
+
             transition={{
+              duration: 0.3,
               delay: index * 0.05,
             }}
 
@@ -267,17 +273,15 @@ export default function TimelinePage() {
             }}
           >
 
-            {/* Top Section */}
+            {/* Top */}
 
             <div className="
 
               flex items-start justify-between
 
-              gap-4
-
               mb-8
 
-              flex-wrap
+              gap-4
 
             ">
 
@@ -293,7 +297,7 @@ export default function TimelinePage() {
 
                 ">
 
-                  {entry.mood || 'Reflective'}
+                  {entry.mood}
 
                 </h2>
 
@@ -333,17 +337,17 @@ export default function TimelinePage() {
 
                   w-11 h-11
 
-                  flex items-center justify-center
-
                   rounded-2xl
+
+                  flex items-center justify-center
 
                   bg-red-500/10
 
                   hover:bg-red-500/20
 
-                  transition-all duration-300
+                  hover:scale-110
 
-                  hover:scale-105
+                  transition-all duration-300
 
                 "
               >
@@ -360,7 +364,7 @@ export default function TimelinePage() {
 
             </div>
 
-            {/* Emotional Stats */}
+            {/* Analytics */}
 
             <div className="
 
@@ -368,7 +372,7 @@ export default function TimelinePage() {
 
               grid-cols-1 md:grid-cols-2
 
-              gap-5
+              gap-6
 
               mb-10
 
@@ -376,44 +380,55 @@ export default function TimelinePage() {
 
               {/* Stress */}
 
-              <div className="
+              <motion.div
 
-                rounded-3xl
+                whileHover={{
+                  scale: 1.03,
+                }}
 
-                p-6
+                className="
 
-                bg-gradient-to-br
+                  rounded-[30px]
 
-                from-red-500/10
-                to-orange-500/10
+                  p-7
 
-                border border-red-500/10
+                  overflow-hidden
 
-              ">
+                  relative
+
+                  bg-gradient-to-br
+
+                  from-red-500/10
+                  to-orange-500/10
+
+                  border border-red-500/10
+
+                "
+              >
 
                 <div className="
 
-                  flex items-center gap-3
+                  flex items-center gap-4
 
-                  mb-5
+                  mb-6
 
                 ">
 
                   <div className="
 
-                    w-12 h-12
+                    w-14 h-14
 
                     rounded-2xl
 
                     flex items-center justify-center
 
-                    bg-red-500/20
+                    bg-red-500/15
 
                   ">
 
                     <Flame
 
-                      size={22}
+                      size={24}
 
                       className="text-red-500"
 
@@ -437,7 +452,7 @@ export default function TimelinePage() {
 
                     <h3 className="
 
-                      text-3xl
+                      text-4xl
 
                       font-semibold
 
@@ -455,11 +470,9 @@ export default function TimelinePage() {
 
                 </div>
 
-                {/* Progress */}
-
                 <div className="
 
-                  w-full h-2
+                  w-full h-3
 
                   rounded-full
 
@@ -477,16 +490,19 @@ export default function TimelinePage() {
                     }}
 
                     animate={{
-                      width: `${entry.stress_level || 0}%`,
+                      width:
+                        `${entry.stress_level}%`,
                     }}
 
                     transition={{
-                      duration: 0.8,
+                      duration: 1,
                     }}
 
                     className="
 
                       h-full
+
+                      rounded-full
 
                       bg-gradient-to-r
 
@@ -498,48 +514,59 @@ export default function TimelinePage() {
 
                 </div>
 
-              </div>
+              </motion.div>
 
               {/* Positivity */}
 
-              <div className="
+              <motion.div
 
-                rounded-3xl
+                whileHover={{
+                  scale: 1.03,
+                }}
 
-                p-6
+                className="
 
-                bg-gradient-to-br
+                  rounded-[30px]
 
-                from-blue-500/10
-                to-green-500/10
+                  p-7
 
-                border border-blue-500/10
+                  overflow-hidden
 
-              ">
+                  relative
+
+                  bg-gradient-to-br
+
+                  from-blue-500/10
+                  to-green-500/10
+
+                  border border-blue-500/10
+
+                "
+              >
 
                 <div className="
 
-                  flex items-center gap-3
+                  flex items-center gap-4
 
-                  mb-5
+                  mb-6
 
                 ">
 
                   <div className="
 
-                    w-12 h-12
+                    w-14 h-14
 
                     rounded-2xl
 
                     flex items-center justify-center
 
-                    bg-blue-500/20
+                    bg-blue-500/15
 
                   ">
 
                     <Heart
 
-                      size={22}
+                      size={24}
 
                       className="text-blue-500"
 
@@ -563,7 +590,7 @@ export default function TimelinePage() {
 
                     <h3 className="
 
-                      text-3xl
+                      text-4xl
 
                       font-semibold
 
@@ -581,11 +608,9 @@ export default function TimelinePage() {
 
                 </div>
 
-                {/* Progress */}
-
                 <div className="
 
-                  w-full h-2
+                  w-full h-3
 
                   rounded-full
 
@@ -603,16 +628,19 @@ export default function TimelinePage() {
                     }}
 
                     animate={{
-                      width: `${entry.positivity_score || 0}%`,
+                      width:
+                        `${entry.positivity_score}%`,
                     }}
 
                     transition={{
-                      duration: 0.8,
+                      duration: 1,
                     }}
 
                     className="
 
                       h-full
+
+                      rounded-full
 
                       bg-gradient-to-r
 
@@ -624,7 +652,7 @@ export default function TimelinePage() {
 
                 </div>
 
-              </div>
+              </motion.div>
 
             </div>
 
@@ -660,9 +688,9 @@ export default function TimelinePage() {
 
             </div>
 
-            {/* AI Reflection */}
+            {/* Reflection */}
 
-            <div className="mb-10">
+            <div>
 
               <h3 className="
 
@@ -691,68 +719,6 @@ export default function TimelinePage() {
                 {entry.ai_response}
 
               </p>
-
-            </div>
-
-            {/* Themes */}
-
-            <div>
-
-              <h3 className="
-
-                text-xl
-
-                font-semibold
-
-                mb-4
-
-              ">
-
-                Emotional Themes
-
-              </h3>
-
-              <div className="flex flex-wrap gap-3">
-
-                {
-
-                  entry.themes
-
-                    ?.split(',')
-
-                    ?.map(
-
-                      (
-                        theme: string,
-                        index: number
-                      ) => (
-
-                        <div
-
-                          key={index}
-
-                          className="
-
-                            px-4 py-2
-
-                            rounded-2xl
-
-                            text-sm
-
-                            bg-black/[0.04]
-                            dark:bg-white/[0.05]
-
-                          "
-                        >
-
-                          {theme.trim()}
-
-                        </div>
-                      )
-                    )
-                }
-
-              </div>
 
             </div>
 
