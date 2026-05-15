@@ -102,7 +102,7 @@ export default function TimelinePage() {
       "
     >
 
-      {/* Glow */}
+      {/* Glow Background */}
 
       <div className="fixed inset-0 -z-10 overflow-hidden">
 
@@ -655,6 +655,94 @@ export default function TimelinePage() {
               </motion.div>
 
             </div>
+
+            {/* Emotional Themes */}
+
+            {
+
+              entry.themes && (
+
+                <div className="mb-10">
+
+                  <h3 className="
+
+                    text-xl
+
+                    font-semibold
+
+                    mb-5
+
+                  ">
+
+                    Emotional Themes
+
+                  </h3>
+
+                  <div className="
+
+                    flex flex-wrap gap-4
+
+                  ">
+
+                    {
+
+                      entry.themes
+
+                        ?.split(',')
+
+                        ?.map(
+
+                          (
+                            theme: string,
+                            index: number
+                          ) => (
+
+                            <motion.div
+
+                              key={index}
+
+                              whileHover={{
+                                scale: 1.05,
+                              }}
+
+                              className="
+
+                                px-5 py-3
+
+                                rounded-2xl
+
+                                text-sm
+
+                                backdrop-blur-xl
+
+                                shadow-sm
+
+                                border
+
+                                bg-black/[0.04]
+                                dark:bg-white/[0.05]
+
+                              "
+
+                              style={{
+
+                                borderColor:
+                                  'var(--border-color)',
+                              }}
+                            >
+
+                              {theme.trim()}
+
+                            </motion.div>
+                          )
+                        )
+                    }
+
+                  </div>
+
+                </div>
+              )
+            }
 
             {/* Journal */}
 

@@ -17,6 +17,9 @@ export default function JournalPage() {
 
   const [loading, setLoading] = useState(false)
 
+  const [themes, setThemes] =
+    useState<string[]>([])
+
   const wordCount =
 
     text.split(' ').filter(Boolean).length
@@ -58,7 +61,7 @@ export default function JournalPage() {
       const moodMatch =
 
         data.result.match(
-          /Main Mood:(.*)/i
+          /Main Mood:\s*(.*)/i
         )
 
       const stressMatch =
@@ -73,12 +76,12 @@ export default function JournalPage() {
           /Positivity Score[^0-9]*(\d+)/i
         )
 
-      // FIXED THEMES REGEX
+      // FIXED SINGLE LINE THEMES
 
       const themesMatch =
 
         data.result.match(
-          /Key Emotional Themes:\s*([\s\S]*?)(?:\n\n|$)/i
+          /Key Emotional Themes:\s*(.*)/i
         )
 
       // -------------------------
@@ -99,9 +102,7 @@ export default function JournalPage() {
               stressMatch[1]
             )
 
-          : Math.floor(
-              Math.random() * 30
-            ) + 40
+          : 50
 
       const positivityScore =
 
@@ -111,21 +112,25 @@ export default function JournalPage() {
               positivityMatch[1]
             )
 
-          : Math.floor(
-              Math.random() * 30
-            ) + 60
+          : 50
 
-      // FIXED THEMES VALUE
+      // CLEAN THEMES
 
-      const themes =
+      const cleanThemes =
 
         themesMatch?.[1]
 
-          ?.replace(/\n/g, '')
+          ?.split(',')
 
-          ?.trim()
+          ?.map((theme: string) =>
+            theme.trim()
+          )
 
-          || 'growth, reflection'
+          ?.filter(Boolean)
+
+          || ['reflection']
+
+      setThemes(cleanThemes)
 
       // -------------------------
       // SAVE TO SUPABASE
@@ -148,7 +153,8 @@ export default function JournalPage() {
 
             positivity_score: positivityScore,
 
-            themes,
+            themes:
+              cleanThemes.join(', '),
           },
         ])
 
@@ -190,7 +196,7 @@ export default function JournalPage() {
       "
     >
 
-      {/* Ambient Glow */}
+      {/* Glow */}
 
       <div className="fixed inset-0 -z-10 overflow-hidden">
 
@@ -417,8 +423,6 @@ export default function JournalPage() {
 
           </div>
 
-          {/* Progress */}
-
           <div className="
 
             mt-3
@@ -501,6 +505,122 @@ export default function JournalPage() {
         </button>
 
       </motion.div>
+
+      {/* Emotional Themes */}
+
+      {
+
+        themes.length > 0 && (
+
+          <motion.div
+
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
+
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+
+            className="
+
+              mt-10
+
+              rounded-[32px]
+
+              p-8
+
+              backdrop-blur-2xl
+
+              shadow-sm
+
+            "
+
+            style={{
+
+              background:
+                'var(--card-bg)',
+
+              border:
+                '1px solid var(--border-color)',
+            }}
+          >
+
+            <h2 className="
+
+              text-3xl
+
+              font-semibold
+
+              mb-6
+
+            ">
+
+              Emotional Themes
+
+            </h2>
+
+            <div className="
+
+              flex flex-wrap gap-4
+
+            ">
+
+              {
+
+                themes.map(
+
+                  (
+                    theme,
+                    index
+                  ) => (
+
+                    <motion.div
+
+                      key={index}
+
+                      whileHover={{
+                        scale: 1.05,
+                      }}
+
+                      className="
+
+                        px-5 py-3
+
+                        rounded-2xl
+
+                        text-sm
+
+                        backdrop-blur-xl
+
+                        border
+
+                        bg-black/[0.04]
+                        dark:bg-white/[0.05]
+
+                      "
+
+                      style={{
+
+                        borderColor:
+                          'var(--border-color)',
+                      }}
+                    >
+
+                      {theme}
+
+                    </motion.div>
+                  )
+                )
+              }
+
+            </div>
+
+          </motion.div>
+        )
+      }
 
       {/* Reflection */}
 
