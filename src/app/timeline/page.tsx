@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-
+import type { User } from '@supabase/supabase-js'
 import {
 
   Trash2,
@@ -19,33 +19,43 @@ import { supabase } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
 
 export default function TimelinePage() {
-
-  const [entries, setEntries] =
-    useState<any[]>([])
-
-  const [deletingId, setDeletingId] =
-    useState<string | null>(null)
+  const router = useRouter()
+  const [user, setUser] = useState<User | null>(null)
+  const [authLoading, setAuthLoading] = useState(true)
+  const [entries, setEntries] = useState<any[]>([])
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
+    const checkAuth = async () => {
+      if (!supabase) {
+        router.push('/auth')
+        setAuthLoading(false)
+        return
+      }
+      const { data } = await supabase.auth.getSession()
+      if (!data?.session?.user) {
+        router.push('/auth')
+      } else {
+        setUser(data.session.user)
+        fetchEntries(data.session.user.id)
+      }
+      setAuthLoading(false)
+    }
+    checkAuth()
+  }, [router])
 
-    fetchEntries()
-
-  }, [])
-
-  const fetchEntries = async () => {
+  const fetchEntries = async (userId: string) => {
+    if (!supabase) return
 
     const { data, error } = await supabase
-
       .from('entries')
-
       .select('*')
-
+      .eq('user_id', userId)
       .order('created_at', {
         ascending: false,
       })
 
     if (!error) {
-
       setEntries(data || [])
     }
   }
@@ -85,6 +95,14 @@ export default function TimelinePage() {
 
       setDeletingId(null)
     }
+  }
+
+  if (authLoading) {
+    return (
+      <main className="relative min-h-screen px-6 py-10 md:px-20 flex items-center justify-center">
+        <div className="text-[var(--text-secondary)]">Loading...</div>
+      </main>
+    )
   }
 
   return (
@@ -277,7 +295,7 @@ export default function TimelinePage() {
 
             <div className="
 
-              flex items-start justify-between
+              flex flex-col md:flex-row md:items-start md:justify-between
 
               mb-8
 
@@ -289,7 +307,7 @@ export default function TimelinePage() {
 
                 <h2 className="
 
-                  text-3xl
+                  text-2xl md:text-3xl
 
                   font-semibold
 
@@ -348,6 +366,8 @@ export default function TimelinePage() {
                   hover:scale-110
 
                   transition-all duration-300
+
+                  self-start
 
                 "
               >

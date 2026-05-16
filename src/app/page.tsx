@@ -1,10 +1,27 @@
 'use client'
 
 import Link from 'next/link'
-
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import type { User } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase'
 
 export default function HomePage() {
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (!supabase) {
+        setLoading(false)
+        return
+      }
+      const { data } = await supabase.auth.getSession()
+      setUser(data?.session?.user || null)
+      setLoading(false)
+    }
+    checkAuth()
+  }, [])
 
   return (
 
@@ -143,7 +160,7 @@ export default function HomePage() {
 
         <Link
 
-          href="/journal"
+          href={user ? "/journal" : "/auth"}
 
           className="
 
@@ -168,7 +185,7 @@ export default function HomePage() {
           "
         >
 
-          Open App
+          {loading ? 'Loading...' : user ? 'Open App' : 'Get Started'}
 
         </Link>
 
@@ -262,101 +279,105 @@ export default function HomePage() {
 
         {/* CTA Buttons */}
 
-        <motion.div
+        {!loading && (
+          <motion.div
 
-          initial={{
-            opacity: 0,
-            y: 30,
-          }}
-
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-
-          transition={{
-            duration: 1,
-          }}
-
-          className="
-
-            flex items-center gap-4
-
-            mt-12
-
-          "
-        >
-
-          <Link
-
-            href="/journal"
-
-            className="
-
-              px-8 py-4
-
-              rounded-2xl
-
-              bg-black
-              text-white
-
-              dark:bg-white
-              dark:text-black
-
-              text-lg
-              font-medium
-
-              hover:scale-[1.03]
-              active:scale-[0.98]
-
-              transition-all duration-300
-
-            "
-          >
-
-            Start Writing
-
-          </Link>
-
-          <Link
-
-            href="/analytics"
-
-            className="
-
-              px-8 py-4
-
-              rounded-2xl
-
-              border
-
-              text-lg
-              font-medium
-
-              backdrop-blur-2xl
-
-              hover:scale-[1.03]
-              active:scale-[0.98]
-
-              transition-all duration-300
-
-            "
-
-            style={{
-
-              background:
-                'var(--card-bg)',
-
-              borderColor:
-                'var(--border-color)',
+            initial={{
+              opacity: 0,
+              y: 30,
             }}
+
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+
+            transition={{
+              duration: 1,
+            }}
+
+            className="
+
+              flex items-center gap-4
+
+              mt-12 flex-wrap
+
+            "
           >
 
-            View Analytics
+            <Link
 
-          </Link>
+              href={user ? "/journal" : "/auth"}
 
-        </motion.div>
+              className="
+
+                px-8 py-4
+
+                rounded-2xl
+
+                bg-black
+                text-white
+
+                dark:bg-white
+                dark:text-black
+
+                text-lg
+                font-medium
+
+                hover:scale-[1.03]
+                active:scale-[0.98]
+
+                transition-all duration-300
+
+              "
+            >
+
+              {user ? 'Start Writing' : 'Sign Up'}
+
+            </Link>
+
+            {user && (
+              <Link
+
+                href="/analytics"
+
+                className="
+
+                  px-8 py-4
+
+                  rounded-2xl
+
+                  border
+
+                  text-lg
+                  font-medium
+
+                  backdrop-blur-2xl
+
+                  hover:scale-[1.03]
+                  active:scale-[0.98]
+
+                  transition-all duration-300
+
+                "
+
+                style={{
+
+                  background:
+                    'var(--card-bg)',
+
+                  borderColor:
+                    'var(--border-color)',
+                }}
+              >
+
+                View Analytics
+
+              </Link>
+            )}
+
+          </motion.div>
+        )}
 
       </section>
 

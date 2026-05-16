@@ -39,15 +39,15 @@ export default function Moodboard({
 
       {/* Colors */}
 
-      <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-3xl p-8">
+      <div className="rounded-[32px] backdrop-blur-2xl shadow-sm p-8 md:p-8" style={{ background: 'var(--card-bg)', border: '1px solid var(--border-color)' }}>
 
-        <h2 className="text-2xl font-semibold mb-6">
+        <h2 className="text-2xl md:text-3xl font-semibold mb-6">
 
           Moodboard Colors
 
         </h2>
 
-        <p className="text-zinc-400 leading-relaxed whitespace-pre-wrap">
+        <p className="leading-relaxed whitespace-pre-wrap text-[var(--text-secondary)]">
 
           {colors || 'No colors generated.'}
 
@@ -57,15 +57,15 @@ export default function Moodboard({
 
       {/* Ambient Scene */}
 
-      <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-3xl p-8">
+      <div className="rounded-[32px] backdrop-blur-2xl shadow-sm p-8 md:p-8" style={{ background: 'var(--card-bg)', border: '1px solid var(--border-color)' }}>
 
-        <h2 className="text-2xl font-semibold mb-4">
+        <h2 className="text-2xl md:text-3xl font-semibold mb-4">
 
           Ambient Scene
 
         </h2>
 
-        <p className="text-zinc-400 leading-relaxed whitespace-pre-wrap">
+        <p className="leading-relaxed whitespace-pre-wrap text-[var(--text-secondary)]">
 
           {ambient || 'No ambient scene generated.'}
 
@@ -75,15 +75,15 @@ export default function Moodboard({
 
       {/* Visual Aesthetic */}
 
-      <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-3xl p-8">
+      <div className="rounded-[32px] backdrop-blur-2xl shadow-sm p-8 md:p-8" style={{ background: 'var(--card-bg)', border: '1px solid var(--border-color)' }}>
 
-        <h2 className="text-2xl font-semibold mb-4">
+        <h2 className="text-2xl md:text-3xl font-semibold mb-4">
 
           Visual Aesthetic
 
         </h2>
 
-        <p className="text-zinc-400 leading-relaxed whitespace-pre-wrap">
+        <p className="leading-relaxed whitespace-pre-wrap text-[var(--text-secondary)]">
 
           {aesthetic || 'No aesthetic generated.'}
 
@@ -93,15 +93,15 @@ export default function Moodboard({
 
       {/* Soundtrack */}
 
-      <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-3xl p-8">
+      <div className="rounded-[32px] backdrop-blur-2xl shadow-sm p-8 md:p-8" style={{ background: 'var(--card-bg)', border: '1px solid var(--border-color)' }}>
 
-        <h2 className="text-2xl font-semibold mb-4">
+        <h2 className="text-2xl md:text-3xl font-semibold mb-4">
 
           Soundtrack Vibe
 
         </h2>
 
-        <p className="text-zinc-400 leading-relaxed whitespace-pre-wrap">
+        <p className="leading-relaxed whitespace-pre-wrap text-[var(--text-secondary)]">
 
           {soundtrack || 'No soundtrack vibe generated.'}
 

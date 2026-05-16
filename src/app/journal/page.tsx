@@ -1,24 +1,39 @@
 'use client'
 
-import { useState } from 'react'
-
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-
+import type { User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
-
 import Navbar from '@/components/Navbar'
 import Moodboard from '@/components/Moodboard'
 
 export default function JournalPage() {
-
+  const router = useRouter()
+  const [user, setUser] = useState<User | null>(null)
+  const [authLoading, setAuthLoading] = useState(true)
   const [text, setText] = useState('')
-
   const [result, setResult] = useState('')
-
   const [loading, setLoading] = useState(false)
+  const [themes, setThemes] = useState<string[]>([])
 
-  const [themes, setThemes] =
-    useState<string[]>([])
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (!supabase) {
+        router.push('/auth')
+        setAuthLoading(false)
+        return
+      }
+      const { data } = await supabase.auth.getSession()
+      if (!data?.session?.user) {
+        router.push('/auth')
+      } else {
+        setUser(data.session.user)
+      }
+      setAuthLoading(false)
+    }
+    checkAuth()
+  }, [router])
 
   const wordCount =
 
@@ -32,6 +47,8 @@ export default function JournalPage() {
   const analyzeJournal = async () => {
 
     if (!text.trim()) return
+
+    if (!supabase || !user) return
 
     try {
 
@@ -136,34 +153,25 @@ export default function JournalPage() {
       // SAVE TO SUPABASE
       // -------------------------
 
-      const { error } = await supabase
+      try {
+        const entry: any = {
+          user_id: user?.id,
+          content: text,
+          ai_response: data.result,
+          mood,
+          stress_level: stressLevel,
+          positivity_score: positivityScore,
+          themes: cleanThemes.join(', '),
+        }
+        const { error } = await (supabase as any)
+          .from('entries')
+          .insert([entry])
 
-        .from('entries')
-
-        .insert([
-
-          {
-            content: text,
-
-            ai_response: data.result,
-
-            mood,
-
-            stress_level: stressLevel,
-
-            positivity_score: positivityScore,
-
-            themes:
-              cleanThemes.join(', '),
-          },
-        ])
-
-      if (error) {
-
-        console.log(
-          'SUPABASE ERROR:',
-          error
-        )
+        if (error) {
+          console.log('SUPABASE ERROR:', error)
+        }
+      } catch (dbError) {
+        console.log('DATABASE ERROR:', dbError)
       }
 
     } catch (error) {
@@ -177,6 +185,14 @@ export default function JournalPage() {
 
       setLoading(false)
     }
+  }
+
+  if (authLoading) {
+    return (
+      <main className="relative min-h-screen px-6 py-10 md:px-20 flex items-center justify-center">
+        <div className="text-[var(--text-secondary)]">Loading...</div>
+      </main>
+    )
   }
 
   return (

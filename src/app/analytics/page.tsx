@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-
+import type { User } from '@supabase/supabase-js'
 import {
 
   ResponsiveContainer,
@@ -31,30 +31,42 @@ import { supabase } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
 
 export default function AnalyticsPage() {
-
-  const [entries, setEntries] =
-    useState<any[]>([])
+  const router = useRouter()
+  const [user, setUser] = useState<User | null>(null)
+  const [authLoading, setAuthLoading] = useState(true)
+  const [entries, setEntries] = useState<any[]>([])
 
   useEffect(() => {
+    const checkAuth = async () => {
+      if (!supabase) {
+        router.push('/auth')
+        setAuthLoading(false)
+        return
+      }
+      const { data } = await supabase.auth.getSession()
+      if (!data?.session?.user) {
+        router.push('/auth')
+      } else {
+        setUser(data.session.user)
+        fetchEntries(data.session.user.id)
+      }
+      setAuthLoading(false)
+    }
+    checkAuth()
+  }, [router])
 
-    fetchEntries()
-
-  }, [])
-
-  const fetchEntries = async () => {
+  const fetchEntries = async (userId: string) => {
+    if (!supabase) return
 
     const { data, error } = await supabase
-
       .from('entries')
-
       .select('*')
-
+      .eq('user_id', userId)
       .order('created_at', {
         ascending: true,
       })
 
     if (!error) {
-
       setEntries(data || [])
     }
   }
@@ -149,6 +161,14 @@ export default function AnalyticsPage() {
         )
 
       : 0
+
+  if (authLoading) {
+    return (
+      <main className="relative min-h-screen px-6 py-10 md:px-20 flex items-center justify-center">
+        <div className="text-[var(--text-secondary)]">Loading...</div>
+      </main>
+    )
+  }
 
   return (
 
@@ -360,7 +380,7 @@ export default function AnalyticsPage() {
 
             <div className={`
 
-              w-40 h-40
+              w-32 h-32 md:w-40 md:h-40
 
               rounded-full
 
@@ -378,7 +398,7 @@ export default function AnalyticsPage() {
 
               <h2 className="
 
-                text-5xl
+                text-3xl md:text-5xl
 
                 font-semibold
 
@@ -455,7 +475,7 @@ export default function AnalyticsPage() {
 
           </h2>
 
-          <div className="h-[420px]">
+          <div className="h-[300px] md:h-[420px]">
 
             <ResponsiveContainer
               width="100%"
@@ -637,7 +657,7 @@ export default function AnalyticsPage() {
 
           </h2>
 
-          <div className="h-[420px]">
+          <div className="h-[300px] md:h-[420px]">
 
             <ResponsiveContainer
               width="100%"

@@ -6,11 +6,15 @@ import { usePathname } from 'next/navigation'
 
 import { motion } from 'framer-motion'
 
+import { LogOut } from 'lucide-react'
+
 import ThemeToggle from './ThemeToggle'
+import { useAuth } from '@/lib/useAuth'
 
 export default function Navbar() {
 
   const pathname = usePathname()
+  const { user, logout } = useAuth()
 
   const navLinks = [
 
@@ -92,82 +96,41 @@ export default function Navbar() {
 
       <div className="flex items-center gap-3">
 
-        <div className="
+        {user && (
+          <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-black/[0.03] dark:bg-white/[0.03]">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href
 
-          flex items-center gap-2
-
-          p-1.5
-
-          rounded-2xl
-
-          bg-black/[0.03]
-          dark:bg-white/[0.03]
-
-        ">
-
-          {navLinks.map((link) => {
-
-            const isActive =
-              pathname === link.href
-
-            return (
-
-              <Link
-
-                key={link.href}
-
-                href={link.href}
-
-                className={`
-
-                  px-4 py-2.5
-
-                  rounded-xl
-
-                  text-sm
-                  font-medium
-
-                  transition-all duration-300
-
-                  ${
-
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${
                     isActive
-
-                      ? `
-
-                        bg-black
-                        text-white
-
-                        dark:bg-white
-                        dark:text-black
-
-                      `
-
-                      : `
-
-                        text-zinc-500
-                        dark:text-zinc-400
-
-                        hover:text-black
-                        dark:hover:text-white
-
-                      `
-                  }
-
-                `}
-              >
-
-                {link.name}
-
-              </Link>
-            )
-          })}
-
-        </div>
+                      ? 'bg-black text-white dark:bg-white dark:text-black'
+                      : 'text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              )
+            })}
+          </div>
+        )}
 
         {/* Theme Toggle */}
-
         <ThemeToggle />
+
+        {/* Auth Button */}
+        {user && (
+          <button
+            onClick={logout}
+            title="Logout"
+            className="p-2.5 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.03] transition-all duration-300"
+          >
+            <LogOut size={20} />
+          </button>
+        )}
 
       </div>
 
