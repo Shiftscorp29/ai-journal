@@ -2,9 +2,17 @@
 
 import { useState } from 'react'
 
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 
 import { useRouter } from 'next/navigation'
+
+import {
+
+  CheckCircle2,
+
+  AlertCircle,
+
+} from 'lucide-react'
 
 import { supabase } from '@/lib/supabase'
 
@@ -24,19 +32,89 @@ export default function AuthPage() {
   const [isSignup, setIsSignup] =
     useState(false)
 
+  const [notification, setNotification] =
+    useState({
+
+      show: false,
+
+      type: 'success',
+
+      message: '',
+    })
+
+  // -------------------------
+  // SHOW NOTIFICATION
+  // -------------------------
+
+  const showNotification = (
+
+    type: any,
+
+    message: string
+  ) => {
+
+    setNotification({
+
+      show: true,
+
+      type,
+
+      message,
+    })
+
+    setTimeout(() => {
+
+      setNotification({
+
+        show: false,
+
+        type: 'success',
+
+        message: '',
+      })
+
+    }, 3500)
+  }
+
+  // -------------------------
+  // AUTH
+  // -------------------------
+
   const handleAuth = async () => {
 
     try {
 
       setLoading(true)
 
+      if (!email || !password) {
+
+        showNotification(
+
+          'error',
+
+          'Please fill all fields.'
+        )
+
+        return
+      }
+
+      if (password.length < 6) {
+
+        showNotification(
+
+          'error',
+
+          'Password must be at least 6 characters.'
+        )
+
+        return
+      }
+
+      // SIGNUP
+
       if (isSignup) {
 
-        // SIGNUP
-
         const {
-
-          data,
 
           error,
 
@@ -49,12 +127,17 @@ export default function AuthPage() {
 
         if (error) {
 
-          alert(error.message)
+          showNotification(
+
+            'error',
+
+            error.message
+          )
 
           return
         }
 
-        // AUTO LOGIN AFTER SIGNUP
+        // AUTO LOGIN
 
         const {
 
@@ -69,12 +152,28 @@ export default function AuthPage() {
 
         if (loginError) {
 
-          alert(loginError.message)
+          showNotification(
+
+            'error',
+
+            loginError.message
+          )
 
           return
         }
 
-        router.push('/journal')
+        showNotification(
+
+          'success',
+
+          'Account created successfully.'
+        )
+
+        setTimeout(() => {
+
+          router.push('/journal')
+
+        }, 1200)
 
       } else {
 
@@ -93,17 +192,40 @@ export default function AuthPage() {
 
         if (error) {
 
-          alert(error.message)
+          showNotification(
+
+            'error',
+
+            error.message
+          )
 
           return
         }
 
-        router.push('/journal')
+        showNotification(
+
+          'success',
+
+          'Successfully signed in.'
+        )
+
+        setTimeout(() => {
+
+          router.push('/journal')
+
+        }, 1200)
       }
 
     } catch (error) {
 
       console.log(error)
+
+      showNotification(
+
+        'error',
+
+        'Something went wrong.'
+      )
 
     } finally {
 
@@ -130,7 +252,7 @@ export default function AuthPage() {
       "
     >
 
-      {/* Glow */}
+      {/* Background Glow */}
 
       <div className="fixed inset-0 -z-10 overflow-hidden">
 
@@ -178,6 +300,122 @@ export default function AuthPage() {
 
       </div>
 
+      {/* Notification */}
+
+      <AnimatePresence>
+
+        {
+
+          notification.show && (
+
+            <motion.div
+
+              initial={{
+                opacity: 0,
+                y: -20,
+                scale: 0.95,
+              }}
+
+              animate={{
+                opacity: 1,
+                y: 0,
+                scale: 1,
+              }}
+
+              exit={{
+                opacity: 0,
+                y: -20,
+                scale: 0.95,
+              }}
+
+              className={`
+
+                fixed
+
+                top-6
+
+                left-1/2
+
+                -translate-x-1/2
+
+                z-50
+
+                flex items-center gap-3
+
+                px-5 py-4
+
+                rounded-2xl
+
+                backdrop-blur-2xl
+
+                border
+
+                shadow-2xl
+
+                text-sm sm:text-base
+
+                ${
+
+                  notification.type ===
+                  'success'
+
+                    ? 'bg-green-500/10 border-green-500/20'
+
+                    : 'bg-red-500/10 border-red-500/20'
+
+                }
+
+              `}
+            >
+
+              {
+
+                notification.type ===
+                'success'
+
+                  ? (
+
+                    <CheckCircle2
+
+                      size={20}
+
+                      className="text-green-500"
+
+                    />
+
+                  )
+
+                  : (
+
+                    <AlertCircle
+
+                      size={20}
+
+                      className="text-red-500"
+
+                    />
+
+                  )
+              }
+
+              <span>
+
+                {
+
+                  notification.message
+
+                }
+
+              </span>
+
+            </motion.div>
+          )
+        }
+
+      </AnimatePresence>
+
+      {/* Card */}
+
       <motion.div
 
         initial={{
@@ -224,6 +462,8 @@ export default function AuthPage() {
           font-semibold
 
           mb-4
+
+          tracking-tight
 
         ">
 
@@ -346,7 +586,11 @@ export default function AuthPage() {
 
             hover:scale-[1.02]
 
+            active:scale-[0.98]
+
             transition-all duration-300
+
+            disabled:opacity-50
 
           "
         >
