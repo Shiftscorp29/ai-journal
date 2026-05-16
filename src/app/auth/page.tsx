@@ -2,7 +2,13 @@
 
 import { useState } from 'react'
 
-import { motion, AnimatePresence } from 'framer-motion'
+import {
+
+  motion,
+
+  AnimatePresence,
+
+} from 'framer-motion'
 
 import { useRouter } from 'next/navigation'
 
@@ -19,6 +25,9 @@ import { supabase } from '@/lib/supabase'
 export default function AuthPage() {
 
   const router = useRouter()
+
+  const [username, setUsername] =
+    useState('')
 
   const [email, setEmail] =
     useState('')
@@ -41,10 +50,6 @@ export default function AuthPage() {
 
       message: '',
     })
-
-  // -------------------------
-  // SHOW NOTIFICATION
-  // -------------------------
 
   const showNotification = (
 
@@ -76,10 +81,6 @@ export default function AuthPage() {
     }, 3500)
   }
 
-  // -------------------------
-  // AUTH
-  // -------------------------
-
   const handleAuth = async () => {
 
     try {
@@ -93,6 +94,21 @@ export default function AuthPage() {
           'error',
 
           'Please fill all fields.'
+        )
+
+        return
+      }
+
+      if (
+        isSignup &&
+        !username
+      ) {
+
+        showNotification(
+
+          'error',
+
+          'Please enter a username.'
         )
 
         return
@@ -116,6 +132,8 @@ export default function AuthPage() {
 
         const {
 
+          data,
+
           error,
 
         } = await supabase.auth.signUp({
@@ -137,30 +155,34 @@ export default function AuthPage() {
           return
         }
 
+        // CREATE PROFILE
+
+        if (data.user) {
+
+          await supabase
+
+            .from('profiles')
+
+            .insert([
+
+              {
+                id: data.user.id,
+
+                username,
+
+                email,
+              },
+            ])
+        }
+
         // AUTO LOGIN
 
-        const {
-
-          error: loginError,
-
-        } = await supabase.auth.signInWithPassword({
+        await supabase.auth.signInWithPassword({
 
           email,
 
           password,
         })
-
-        if (loginError) {
-
-          showNotification(
-
-            'error',
-
-            loginError.message
-          )
-
-          return
-        }
 
         showNotification(
 
@@ -252,54 +274,6 @@ export default function AuthPage() {
       "
     >
 
-      {/* Background Glow */}
-
-      <div className="fixed inset-0 -z-10 overflow-hidden">
-
-        <div
-
-          className="
-
-            absolute
-
-            top-[-120px]
-            left-[-120px]
-
-            w-[350px]
-            h-[350px]
-
-            rounded-full
-
-            bg-blue-400/20
-
-            blur-3xl
-
-          "
-        />
-
-        <div
-
-          className="
-
-            absolute
-
-            bottom-[-120px]
-            right-[-120px]
-
-            w-[350px]
-            h-[350px]
-
-            rounded-full
-
-            bg-purple-400/20
-
-            blur-3xl
-
-          "
-        />
-
-      </div>
-
       {/* Notification */}
 
       <AnimatePresence>
@@ -313,19 +287,16 @@ export default function AuthPage() {
               initial={{
                 opacity: 0,
                 y: -20,
-                scale: 0.95,
               }}
 
               animate={{
                 opacity: 1,
                 y: 0,
-                scale: 1,
               }}
 
               exit={{
                 opacity: 0,
                 y: -20,
-                scale: 0.95,
               }}
 
               className={`
@@ -351,8 +322,6 @@ export default function AuthPage() {
                 border
 
                 shadow-2xl
-
-                text-sm sm:text-base
 
                 ${
 
@@ -463,8 +432,6 @@ export default function AuthPage() {
 
           mb-4
 
-          tracking-tight
-
         ">
 
           {
@@ -491,6 +458,48 @@ export default function AuthPage() {
           privately yours.
 
         </p>
+
+        {/* Username */}
+
+        {
+
+          isSignup && (
+
+            <input
+
+              type="text"
+
+              placeholder="Username"
+
+              value={username}
+
+              onChange={(e) =>
+                setUsername(
+                  e.target.value
+                )
+              }
+
+              className="
+
+                w-full
+
+                h-14
+
+                px-5
+
+                rounded-2xl
+
+                mb-5
+
+                bg-black/[0.04]
+                dark:bg-white/[0.05]
+
+                outline-none
+
+              "
+            />
+          )
+        }
 
         {/* Email */}
 
@@ -586,11 +595,7 @@ export default function AuthPage() {
 
             hover:scale-[1.02]
 
-            active:scale-[0.98]
-
             transition-all duration-300
-
-            disabled:opacity-50
 
           "
         >

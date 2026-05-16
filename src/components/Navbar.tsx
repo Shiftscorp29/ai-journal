@@ -28,6 +28,8 @@ import {
 
   X,
 
+  User,
+
 } from 'lucide-react'
 
 import {
@@ -47,6 +49,9 @@ export default function Navbar() {
 
   const [menuOpen, setMenuOpen] =
     useState(false)
+
+  const [username, setUsername] =
+    useState('User')
 
   useEffect(() => {
 
@@ -68,9 +73,36 @@ export default function Navbar() {
       setDark(true)
     }
 
+    fetchProfile()
+
   }, [])
 
-  // THEME
+  const fetchProfile = async () => {
+
+    const {
+
+      data: { user },
+
+    } = await supabase.auth.getUser()
+
+    if (!user) return
+
+    const { data } =
+      await supabase
+
+        .from('profiles')
+
+        .select('username')
+
+        .eq('id', user.id)
+
+        .single()
+
+    if (data?.username) {
+
+      setUsername(data.username)
+    }
+  }
 
   const toggleTheme = () => {
 
@@ -97,8 +129,6 @@ export default function Navbar() {
 
     setDark(!dark)
   }
-
-  // LOGOUT
 
   const logout = async () => {
 
@@ -182,30 +212,21 @@ export default function Navbar() {
 
       <Link href="/journal">
 
-        <motion.h1
+        <h1 className="
 
-          whileHover={{
-            scale: 1.03,
-          }}
+          text-lg sm:text-xl
 
-          className="
+          font-semibold
 
-            text-lg sm:text-xl
-
-            font-semibold
-
-            tracking-tight
-
-          "
-        >
+        ">
 
           MindFrame
 
-        </motion.h1>
+        </h1>
 
       </Link>
 
-      {/* Desktop Links */}
+      {/* Desktop Nav */}
 
       <div className="
 
@@ -236,8 +257,6 @@ export default function Navbar() {
                 hover:bg-black/[0.05]
                 dark:hover:bg-white/[0.05]
 
-                transition-all duration-300
-
               "
             >
 
@@ -253,27 +272,76 @@ export default function Navbar() {
 
       <div className="
 
-        flex items-center gap-2
+        flex items-center gap-3
 
       ">
 
-        {/* Theme Toggle */}
+        {/* User */}
 
-        <motion.button
+        <div className="
 
-          whileHover={{
-            scale: 1.08,
-          }}
+          hidden sm:flex
 
-          whileTap={{
-            scale: 0.95,
-          }}
+          items-center gap-3
+
+          px-4 py-2
+
+          rounded-2xl
+
+          border
+
+          bg-black/[0.03]
+          dark:bg-white/[0.04]
+
+        "
+
+        style={{
+
+          borderColor:
+            'var(--border-color)',
+        }}
+        >
+
+          <div className="
+
+            w-9 h-9
+
+            rounded-xl
+
+            flex items-center justify-center
+
+            bg-gradient-to-br
+
+            from-blue-500/20
+            to-purple-500/20
+
+          ">
+
+            <User size={16} />
+
+          </div>
+
+          <span className="
+
+            text-sm
+
+            font-medium
+
+          ">
+
+            {username}
+
+          </span>
+
+        </div>
+
+        {/* Theme */}
+
+        <button
 
           onClick={toggleTheme}
 
           className="
-
-            relative
 
             w-11 h-11
 
@@ -281,13 +349,7 @@ export default function Navbar() {
 
             flex items-center justify-center
 
-            overflow-hidden
-
             border
-
-            shadow-lg
-
-            transition-all duration-300
 
             bg-gradient-to-br
 
@@ -306,70 +368,44 @@ export default function Navbar() {
           }}
         >
 
-          <div className="
+          {
 
-            absolute inset-0
+            dark
 
-            bg-white/10
+              ? (
 
-            dark:bg-black/10
+                <Sun
 
-            backdrop-blur-xl
+                  size={18}
 
-          " />
+                  className="text-yellow-500"
 
-          <div className="relative z-10">
+                />
 
-            {
+              )
 
-              dark
+              : (
 
-                ? (
+                <Moon
 
-                  <Sun
+                  size={18}
 
-                    size={18}
+                  className="text-blue-500"
 
-                    className="text-yellow-500"
+                />
 
-                  />
+              )
+          }
 
-                )
-
-                : (
-
-                  <Moon
-
-                    size={18}
-
-                    className="text-blue-500"
-
-                  />
-
-                )
-            }
-
-          </div>
-
-        </motion.button>
+        </button>
 
         {/* Logout */}
 
-        <motion.button
-
-          whileHover={{
-            scale: 1.08,
-          }}
-
-          whileTap={{
-            scale: 0.95,
-          }}
+        <button
 
           onClick={logout}
 
           className="
-
-            relative
 
             w-11 h-11
 
@@ -377,13 +413,7 @@ export default function Navbar() {
 
             flex items-center justify-center
 
-            overflow-hidden
-
             border
-
-            shadow-lg
-
-            transition-all duration-300
 
             bg-gradient-to-br
 
@@ -399,34 +429,17 @@ export default function Navbar() {
           }}
         >
 
-          <div className="
-
-            absolute inset-0
-
-            bg-white/10
-
-            dark:bg-black/10
-
-            backdrop-blur-xl
-
-          " />
-
           <LogOut
 
             size={18}
 
-            className="
+            className="text-red-500"
 
-              relative z-10
-
-              text-red-500
-
-            "
           />
 
-        </motion.button>
+        </button>
 
-        {/* Mobile Menu */}
+        {/* Mobile */}
 
         <button
 
@@ -445,9 +458,6 @@ export default function Navbar() {
             flex items-center justify-center
 
             border
-
-            bg-black/[0.04]
-            dark:bg-white/[0.05]
 
           "
 
@@ -471,97 +481,6 @@ export default function Navbar() {
         </button>
 
       </div>
-
-      {/* Mobile Dropdown */}
-
-      {
-
-        menuOpen && (
-
-          <motion.div
-
-            initial={{
-              opacity: 0,
-              y: -10,
-            }}
-
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-
-            className="
-
-              absolute
-
-              top-[88px]
-              left-0
-
-              w-full
-
-              rounded-[28px]
-
-              p-4
-
-              backdrop-blur-2xl
-
-              border
-
-              shadow-xl
-
-              flex flex-col gap-3
-
-              md:hidden
-
-            "
-
-            style={{
-
-              background:
-                'var(--card-bg)',
-
-              borderColor:
-                'var(--border-color)',
-            }}
-          >
-
-            {
-
-              navLinks.map((link) => (
-
-                <Link
-
-                  key={link.name}
-
-                  href={link.href}
-
-                  onClick={() =>
-                    setMenuOpen(false)
-                  }
-
-                  className="
-
-                    px-4 py-3
-
-                    rounded-2xl
-
-                    hover:bg-black/[0.05]
-                    dark:hover:bg-white/[0.05]
-
-                    transition-all
-
-                  "
-                >
-
-                  {link.name}
-
-                </Link>
-              ))
-            }
-
-          </motion.div>
-        )
-      }
 
     </motion.nav>
   )
