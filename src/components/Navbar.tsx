@@ -14,6 +14,8 @@ import {
 
   motion,
 
+  AnimatePresence,
+
 } from 'framer-motion'
 
 import {
@@ -77,6 +79,8 @@ export default function Navbar() {
 
   }, [])
 
+  // FETCH USER
+
   const fetchProfile = async () => {
 
     const {
@@ -104,6 +108,8 @@ export default function Navbar() {
     }
   }
 
+  // THEME
+
   const toggleTheme = () => {
 
     if (dark) {
@@ -129,6 +135,8 @@ export default function Navbar() {
 
     setDark(!dark)
   }
+
+  // LOGOUT
 
   const logout = async () => {
 
@@ -157,207 +165,149 @@ export default function Navbar() {
 
   return (
 
-    <motion.nav
+    <>
 
-      initial={{
-        opacity: 0,
-        y: -20,
-      }}
+      {/* NAVBAR */}
 
-      animate={{
-        opacity: 1,
-        y: 0,
-      }}
+      <motion.nav
 
-      className="
+        initial={{
+          opacity: 0,
+          y: -20,
+        }}
 
-        fixed
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
 
-        top-5 left-1/2
+        className="
 
-        -translate-x-1/2
+          fixed
 
-        z-50
+          top-5 left-1/2
 
-        w-[95%]
-        max-w-6xl
+          -translate-x-1/2
 
-        px-4 sm:px-6
+          z-[100]
 
-        py-4
+          w-[95%]
+          max-w-6xl
 
-        rounded-[30px]
+          px-4 sm:px-6
 
-        backdrop-blur-2xl
+          py-4
 
-        border
+          rounded-[30px]
 
-        flex items-center justify-between
-
-        shadow-xl
-
-      "
-
-      style={{
-
-        background:
-          'var(--card-bg)',
-
-        borderColor:
-          'var(--border-color)',
-      }}
-    >
-
-      {/* Logo */}
-
-      <Link href="/journal">
-
-        <h1 className="
-
-          text-lg sm:text-xl
-
-          font-semibold
-
-        ">
-
-          MindFrame
-
-        </h1>
-
-      </Link>
-
-      {/* Desktop Nav */}
-
-      <div className="
-
-        hidden md:flex
-
-        items-center gap-3
-
-      ">
-
-        {
-
-          navLinks.map((link) => (
-
-            <Link
-
-              key={link.name}
-
-              href={link.href}
-
-              className="
-
-                px-4 py-2
-
-                rounded-2xl
-
-                text-sm
-
-                hover:bg-black/[0.05]
-                dark:hover:bg-white/[0.05]
-
-              "
-            >
-
-              {link.name}
-
-            </Link>
-          ))
-        }
-
-      </div>
-
-      {/* Right */}
-
-      <div className="
-
-        flex items-center gap-3
-
-      ">
-
-        {/* User */}
-
-        <div className="
-
-          hidden sm:flex
-
-          items-center gap-3
-
-          px-4 py-2
-
-          rounded-2xl
+          backdrop-blur-2xl
 
           border
 
-          bg-black/[0.03]
-          dark:bg-white/[0.04]
+          flex items-center justify-between
+
+          shadow-xl
 
         "
 
         style={{
 
+          background:
+            'var(--card-bg)',
+
           borderColor:
             'var(--border-color)',
         }}
-        >
+      >
 
-          <div className="
+        {/* Logo */}
 
-            w-9 h-9
+        <Link href="/journal">
 
-            rounded-xl
+          <h1 className="
 
-            flex items-center justify-center
+            text-lg sm:text-xl
 
-            bg-gradient-to-br
+            font-semibold
 
-            from-blue-500/20
-            to-purple-500/20
-
-          ">
-
-            <User size={16} />
-
-          </div>
-
-          <span className="
-
-            text-sm
-
-            font-medium
+            tracking-tight
 
           ">
 
-            {username}
+            MindFrame
 
-          </span>
+          </h1>
+
+        </Link>
+
+        {/* Desktop Nav */}
+
+        <div className="
+
+          hidden md:flex
+
+          items-center gap-3
+
+        ">
+
+          {
+
+            navLinks.map((link) => (
+
+              <Link
+
+                key={link.name}
+
+                href={link.href}
+
+                className="
+
+                  px-4 py-2
+
+                  rounded-2xl
+
+                  text-sm
+
+                  hover:bg-black/[0.05]
+                  dark:hover:bg-white/[0.05]
+
+                  transition-all duration-300
+
+                "
+              >
+
+                {link.name}
+
+              </Link>
+            ))
+          }
 
         </div>
 
-        {/* Theme */}
+        {/* Right */}
 
-        <button
+        <div className="
 
-          onClick={toggleTheme}
+          flex items-center gap-2
 
-          className="
+        ">
 
-            w-11 h-11
+          {/* User */}
+
+          <div className="
+
+            hidden lg:flex
+
+            items-center gap-3
+
+            px-4 py-2
 
             rounded-2xl
 
-            flex items-center justify-center
-
             border
 
-            bg-gradient-to-br
-
-            from-yellow-400/20
-            to-orange-400/20
-
-            dark:from-blue-500/20
-            dark:to-purple-500/20
+            bg-black/[0.03]
+            dark:bg-white/[0.04]
 
           "
 
@@ -366,122 +316,371 @@ export default function Navbar() {
             borderColor:
               'var(--border-color)',
           }}
-        >
+          >
 
-          {
+            <div className="
 
-            dark
+              w-9 h-9
 
-              ? (
+              rounded-xl
 
-                <Sun
+              flex items-center justify-center
 
-                  size={18}
+              bg-gradient-to-br
 
-                  className="text-yellow-500"
+              from-blue-500/20
+              to-purple-500/20
 
-                />
+            ">
 
-              )
+              <User size={16} />
 
-              : (
+            </div>
 
-                <Moon
+            <span className="
 
-                  size={18}
+              text-sm
 
-                  className="text-blue-500"
+              font-medium
 
-                />
+            ">
 
-              )
-          }
+              {username}
 
-        </button>
+            </span>
 
-        {/* Logout */}
+          </div>
 
-        <button
+          {/* Theme */}
 
-          onClick={logout}
+          <button
 
-          className="
+            onClick={toggleTheme}
 
-            w-11 h-11
+            className="
 
-            rounded-2xl
+              w-11 h-11
 
-            flex items-center justify-center
+              rounded-2xl
 
-            border
+              flex items-center justify-center
 
-            bg-gradient-to-br
+              border
 
-            from-red-500/20
-            to-orange-500/20
+              bg-gradient-to-br
 
-          "
+              from-yellow-400/20
+              to-orange-400/20
 
-          style={{
+              dark:from-blue-500/20
+              dark:to-purple-500/20
 
-            borderColor:
-              'var(--border-color)',
-          }}
-        >
+            "
 
-          <LogOut
+            style={{
 
-            size={18}
+              borderColor:
+                'var(--border-color)',
+            }}
+          >
 
-            className="text-red-500"
+            {
 
-          />
+              dark
 
-        </button>
+                ? (
 
-        {/* Mobile */}
+                  <Sun
 
-        <button
+                    size={18}
 
-          onClick={() =>
-            setMenuOpen(!menuOpen)
-          }
+                    className="text-yellow-500"
 
-          className="
+                  />
 
-            md:hidden
+                )
 
-            w-11 h-11
+                : (
 
-            rounded-2xl
+                  <Moon
 
-            flex items-center justify-center
+                    size={18}
 
-            border
+                    className="text-blue-500"
 
-          "
+                  />
 
-          style={{
+                )
+            }
 
-            borderColor:
-              'var(--border-color)',
-          }}
-        >
+          </button>
 
-          {
+          {/* Logout */}
 
-            menuOpen
+          <button
 
-              ? <X size={20} />
+            onClick={logout}
 
-              : <Menu size={20} />
+            className="
 
-          }
+              w-11 h-11
 
-        </button>
+              rounded-2xl
 
-      </div>
+              flex items-center justify-center
 
-    </motion.nav>
+              border
+
+              bg-gradient-to-br
+
+              from-red-500/20
+              to-orange-500/20
+
+            "
+
+            style={{
+
+              borderColor:
+                'var(--border-color)',
+            }}
+          >
+
+            <LogOut
+
+              size={18}
+
+              className="text-red-500"
+
+            />
+
+          </button>
+
+          {/* Mobile Menu */}
+
+          <button
+
+            onClick={() =>
+              setMenuOpen(!menuOpen)
+            }
+
+            className="
+
+              md:hidden
+
+              w-11 h-11
+
+              rounded-2xl
+
+              flex items-center justify-center
+
+              border
+
+              bg-black/[0.04]
+              dark:bg-white/[0.05]
+
+            "
+
+            style={{
+
+              borderColor:
+                'var(--border-color)',
+            }}
+          >
+
+            {
+
+              menuOpen
+
+                ? <X size={20} />
+
+                : <Menu size={20} />
+
+            }
+
+          </button>
+
+        </div>
+
+      </motion.nav>
+
+      {/* MOBILE MENU */}
+
+      <AnimatePresence>
+
+        {
+
+          menuOpen && (
+
+            <motion.div
+
+              initial={{
+                opacity: 0,
+                y: -20,
+              }}
+
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+
+              exit={{
+                opacity: 0,
+                y: -20,
+              }}
+
+              className="
+
+                fixed
+
+                top-24
+
+                left-1/2
+
+                -translate-x-1/2
+
+                z-[99]
+
+                w-[92%]
+
+                rounded-[32px]
+
+                p-5
+
+                backdrop-blur-2xl
+
+                border
+
+                shadow-2xl
+
+                md:hidden
+
+              "
+
+              style={{
+
+                background:
+                  'var(--card-bg)',
+
+                borderColor:
+                  'var(--border-color)',
+              }}
+            >
+
+              {/* Mobile User */}
+
+              <div className="
+
+                flex items-center gap-3
+
+                mb-5
+
+                p-3
+
+                rounded-2xl
+
+                bg-black/[0.03]
+                dark:bg-white/[0.04]
+
+              ">
+
+                <div className="
+
+                  w-10 h-10
+
+                  rounded-xl
+
+                  flex items-center justify-center
+
+                  bg-gradient-to-br
+
+                  from-blue-500/20
+                  to-purple-500/20
+
+                ">
+
+                  <User size={18} />
+
+                </div>
+
+                <div>
+
+                  <p className="
+
+                    text-sm
+
+                    text-[var(--text-secondary)]
+
+                  ">
+
+                    Logged in as
+
+                  </p>
+
+                  <h3 className="font-medium">
+
+                    {username}
+
+                  </h3>
+
+                </div>
+
+              </div>
+
+              {/* Links */}
+
+              <div className="
+
+                flex flex-col gap-3
+
+              ">
+
+                {
+
+                  navLinks.map((link) => (
+
+                    <Link
+
+                      key={link.name}
+
+                      href={link.href}
+
+                      onClick={() =>
+                        setMenuOpen(false)
+                      }
+
+                      className="
+
+                        px-4 py-4
+
+                        rounded-2xl
+
+                        text-sm
+
+                        bg-black/[0.03]
+                        dark:bg-white/[0.04]
+
+                        hover:bg-black/[0.05]
+                        dark:hover:bg-white/[0.07]
+
+                        transition-all duration-300
+
+                      "
+                    >
+
+                      {link.name}
+
+                    </Link>
+                  ))
+                }
+
+              </div>
+
+            </motion.div>
+          )
+        }
+
+      </AnimatePresence>
+
+    </>
   )
 }
