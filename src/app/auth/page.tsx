@@ -18,6 +18,8 @@ import {
 
   AlertCircle,
 
+  Sparkles,
+
 } from 'lucide-react'
 
 import { supabase } from '@/lib/supabase'
@@ -51,6 +53,10 @@ export default function AuthPage() {
       message: '',
     })
 
+  // -------------------------
+  // NOTIFICATION
+  // -------------------------
+
   const showNotification = (
 
     type: any,
@@ -81,6 +87,10 @@ export default function AuthPage() {
     }, 3500)
   }
 
+  // -------------------------
+  // AUTH
+  // -------------------------
+
   const handleAuth = async () => {
 
     try {
@@ -108,7 +118,7 @@ export default function AuthPage() {
 
           'error',
 
-          'Please enter a username.'
+          'Enter a username.'
         )
 
         return
@@ -155,7 +165,7 @@ export default function AuthPage() {
           return
         }
 
-        // CREATE PROFILE
+        // PROFILE
 
         if (data.user) {
 
@@ -265,14 +275,92 @@ export default function AuthPage() {
 
         min-h-screen
 
-        flex items-center justify-center
-
-        px-5
-
         overflow-hidden
+
+        px-5 py-10
+
+        flex items-center justify-center
 
       "
     >
+
+      {/* Ambient Background */}
+
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+
+        {/* Top Glow */}
+
+        <div
+
+          className="
+
+            absolute
+
+            top-[-150px]
+            left-[-120px]
+
+            w-[420px]
+            h-[420px]
+
+            rounded-full
+
+            bg-blue-400/20
+            dark:bg-blue-500/10
+
+            blur-3xl
+
+          "
+        />
+
+        {/* Bottom Glow */}
+
+        <div
+
+          className="
+
+            absolute
+
+            bottom-[-150px]
+            right-[-120px]
+
+            w-[420px]
+            h-[420px]
+
+            rounded-full
+
+            bg-purple-400/20
+            dark:bg-purple-500/10
+
+            blur-3xl
+
+          "
+        />
+
+        {/* Center Glow */}
+
+        <div
+
+          className="
+
+            absolute
+
+            top-[35%]
+            left-[40%]
+
+            w-[300px]
+            h-[300px]
+
+            rounded-full
+
+            bg-pink-400/10
+            dark:bg-pink-500/10
+
+            blur-3xl
+
+          "
+        />
+
+      </div>
 
       {/* Notification */}
 
@@ -287,16 +375,19 @@ export default function AuthPage() {
               initial={{
                 opacity: 0,
                 y: -20,
+                scale: 0.95,
               }}
 
               animate={{
                 opacity: 1,
                 y: 0,
+                scale: 1,
               }}
 
               exit={{
                 opacity: 0,
                 y: -20,
+                scale: 0.95,
               }}
 
               className={`
@@ -322,6 +413,8 @@ export default function AuthPage() {
                 border
 
                 shadow-2xl
+
+                text-sm sm:text-base
 
                 ${
 
@@ -383,273 +476,434 @@ export default function AuthPage() {
 
       </AnimatePresence>
 
-      {/* Card */}
+      {/* Main Layout */}
 
-      <motion.div
+      <div className="
 
-        initial={{
-          opacity: 0,
-          y: 20,
-        }}
+        w-full
+        max-w-6xl
 
-        animate={{
-          opacity: 1,
-          y: 0,
-        }}
+        grid
 
-        className="
+        lg:grid-cols-2
 
-          w-full
-          max-w-md
+        gap-10
 
-          rounded-[36px]
+        items-center
 
-          p-6 sm:p-10
+      ">
 
-          backdrop-blur-2xl
+        {/* LEFT SIDE */}
 
-          shadow-sm
+        <motion.div
 
-          border
+          initial={{
+            opacity: 0,
+            x: -30,
+          }}
 
-        "
-
-        style={{
-
-          background:
-            'var(--card-bg)',
-
-          borderColor:
-            'var(--border-color)',
-        }}
-      >
-
-        <h1 className="
-
-          text-4xl sm:text-5xl
-
-          font-semibold
-
-          mb-4
-
-        ">
-
-          {
-
-            isSignup
-
-              ? 'Create Account'
-
-              : 'Welcome Back'
-
-          }
-
-        </h1>
-
-        <p className="
-
-          mb-10
-
-          text-[var(--text-secondary)]
-
-        ">
-
-          Your reflections,
-          privately yours.
-
-        </p>
-
-        {/* Username */}
-
-        {
-
-          isSignup && (
-
-            <input
-
-              type="text"
-
-              placeholder="Username"
-
-              value={username}
-
-              onChange={(e) =>
-                setUsername(
-                  e.target.value
-                )
-              }
-
-              className="
-
-                w-full
-
-                h-14
-
-                px-5
-
-                rounded-2xl
-
-                mb-5
-
-                bg-black/[0.04]
-                dark:bg-white/[0.05]
-
-                outline-none
-
-              "
-            />
-          )
-        }
-
-        {/* Email */}
-
-        <input
-
-          type="email"
-
-          placeholder="Email"
-
-          value={email}
-
-          onChange={(e) =>
-            setEmail(e.target.value)
-          }
+          animate={{
+            opacity: 1,
+            x: 0,
+          }}
 
           className="
 
-            w-full
-
-            h-14
-
-            px-5
-
-            rounded-2xl
-
-            mb-5
-
-            bg-black/[0.04]
-            dark:bg-white/[0.05]
-
-            outline-none
+            hidden lg:block
 
           "
-        />
+        >
 
-        {/* Password */}
+          <div className="
 
-        <input
+            inline-flex
 
-          type="password"
+            items-center gap-3
 
-          placeholder="Password"
-
-          value={password}
-
-          onChange={(e) =>
-            setPassword(e.target.value)
-          }
-
-          className="
-
-            w-full
-
-            h-14
-
-            px-5
+            px-5 py-3
 
             rounded-2xl
+
+            border
+
+            backdrop-blur-xl
 
             mb-8
 
-            bg-black/[0.04]
-            dark:bg-white/[0.05]
-
-            outline-none
-
           "
-        />
 
-        {/* Button */}
+          style={{
 
-        <button
+            borderColor:
+              'var(--border-color)',
+          }}
+          >
 
-          onClick={handleAuth}
+            <Sparkles
 
-          disabled={loading}
+              size={18}
+
+              className="text-blue-500"
+
+            />
+
+            <span className="
+
+              text-sm
+
+              text-[var(--text-secondary)]
+
+            ">
+
+              AI-Powered Emotional Intelligence
+
+            </span>
+
+          </div>
+
+          <h1 className="
+
+            text-6xl
+
+            leading-tight
+
+            font-semibold
+
+            tracking-tight
+
+            mb-8
+
+          ">
+
+            Reflect.
+
+            <br />
+
+            Understand.
+
+            <br />
+
+            Grow.
+
+          </h1>
+
+          <p className="
+
+            text-xl
+
+            leading-relaxed
+
+            max-w-xl
+
+            text-[var(--text-secondary)]
+
+          ">
+
+            Transform your thoughts into
+            cinematic emotional reflections
+            powered by AI-driven insights,
+            analytics, and mindful journaling.
+
+          </p>
+
+        </motion.div>
+
+        {/* RIGHT SIDE */}
+
+        <motion.div
+
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
 
           className="
 
             w-full
 
-            h-14
+            rounded-[36px]
 
-            rounded-2xl
+            p-6 sm:p-10
 
-            bg-black
-            text-white
+            backdrop-blur-2xl
 
-            dark:bg-white
-            dark:text-black
+            shadow-2xl
 
-            font-medium
-
-            hover:scale-[1.02]
-
-            transition-all duration-300
+            border
 
           "
+
+          style={{
+
+            background:
+              'var(--card-bg)',
+
+            borderColor:
+              'var(--border-color)',
+          }}
         >
 
-          {
+          <h2 className="
 
-            loading
+            text-4xl sm:text-5xl
 
-              ? 'Please wait...'
+            font-semibold
 
-              : isSignup
+            mb-4
+
+            tracking-tight
+
+          ">
+
+            {
+
+              isSignup
 
                 ? 'Create Account'
 
-                : 'Sign In'
+                : 'Welcome Back'
 
-          }
+            }
 
-        </button>
+          </h2>
 
-        {/* Toggle */}
+          <p className="
 
-        <button
-
-          onClick={() =>
-            setIsSignup(!isSignup)
-          }
-
-          className="
-
-            mt-6
-
-            text-sm
+            mb-10
 
             text-[var(--text-secondary)]
 
-            hover:underline
+          ">
 
-          "
-        >
+            Your emotional space,
+            privately yours.
+
+          </p>
+
+          {/* Username */}
 
           {
 
-            isSignup
+            isSignup && (
 
-              ? 'Already have an account? Sign In'
+              <input
 
-              : 'Create a new account'
+                type="text"
 
+                placeholder="Username"
+
+                value={username}
+
+                onChange={(e) =>
+                  setUsername(
+                    e.target.value
+                  )
+                }
+
+                className="
+
+                  w-full
+
+                  h-14
+
+                  px-5
+
+                  rounded-2xl
+
+                  mb-5
+
+                  border
+
+                  bg-black/[0.03]
+                  dark:bg-white/[0.04]
+
+                  outline-none
+
+                "
+
+                style={{
+
+                  borderColor:
+                    'var(--border-color)',
+                }}
+              />
+            )
           }
 
-        </button>
+          {/* Email */}
 
-      </motion.div>
+          <input
+
+            type="email"
+
+            placeholder="Email"
+
+            value={email}
+
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
+
+            className="
+
+              w-full
+
+              h-14
+
+              px-5
+
+              rounded-2xl
+
+              mb-5
+
+              border
+
+              bg-black/[0.03]
+              dark:bg-white/[0.04]
+
+              outline-none
+
+            "
+
+            style={{
+
+              borderColor:
+                'var(--border-color)',
+            }}
+          />
+
+          {/* Password */}
+
+          <input
+
+            type="password"
+
+            placeholder="Password"
+
+            value={password}
+
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+
+            className="
+
+              w-full
+
+              h-14
+
+              px-5
+
+              rounded-2xl
+
+              mb-8
+
+              border
+
+              bg-black/[0.03]
+              dark:bg-white/[0.04]
+
+              outline-none
+
+            "
+
+            style={{
+
+              borderColor:
+                'var(--border-color)',
+            }}
+          />
+
+          {/* Button */}
+
+          <button
+
+            onClick={handleAuth}
+
+            disabled={loading}
+
+            className="
+
+              w-full
+
+              h-14
+
+              rounded-2xl
+
+              bg-black
+              text-white
+
+              dark:bg-white
+              dark:text-black
+
+              font-medium
+
+              hover:scale-[1.02]
+
+              active:scale-[0.98]
+
+              transition-all duration-300
+
+            "
+          >
+
+            {
+
+              loading
+
+                ? 'Please wait...'
+
+                : isSignup
+
+                  ? 'Create Account'
+
+                  : 'Sign In'
+
+            }
+
+          </button>
+
+          {/* Toggle */}
+
+          <button
+
+            onClick={() =>
+              setIsSignup(!isSignup)
+            }
+
+            className="
+
+              mt-6
+
+              text-sm
+
+              text-[var(--text-secondary)]
+
+              hover:underline
+
+            "
+          >
+
+            {
+
+              isSignup
+
+                ? 'Already have an account? Sign In'
+
+                : 'Create a new account'
+
+            }
+
+          </button>
+
+        </motion.div>
+
+      </div>
 
     </main>
   )
