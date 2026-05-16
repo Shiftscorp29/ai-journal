@@ -30,10 +30,15 @@ import { supabase } from '@/lib/supabase'
 
 import Navbar from '@/components/Navbar'
 
+import AuthGuard from '@/components/AuthGuard'
+
 export default function AnalyticsPage() {
 
   const [entries, setEntries] =
     useState<any[]>([])
+
+  const [loading, setLoading] =
+    useState(true)
 
   useEffect(() => {
 
@@ -43,56 +48,66 @@ export default function AnalyticsPage() {
 
   const fetchEntries = async () => {
 
-    const { data, error } = await supabase
+    try {
 
-      .from('entries')
+      const {
 
-      .select('*')
+        data: { user },
 
-      .order('created_at', {
-        ascending: true,
-      })
+      } = await supabase.auth.getUser()
 
-    if (!error) {
+      if (!user) return
 
-      setEntries(data || [])
+      const { data, error } =
+        await supabase
+
+          .from('entries')
+
+          .select('*')
+
+          .eq('user_id', user.id)
+
+          .order('created_at', {
+            ascending: true,
+          })
+
+      if (!error) {
+
+        setEntries(data || [])
+      }
+
+    } catch (error) {
+
+      console.log(error)
+
+    } finally {
+
+      setLoading(false)
     }
   }
 
-  // -------------------------
-  // STABLE UNIQUE GRAPH DATA
-  // -------------------------
+  // GRAPH DATA
 
   const chartData = entries.map(
 
-    (entry, index) => ({
+    (entry) => ({
 
-      id: entry.id,
+      date:
 
-      index,
+        new Date(
+          entry.created_at
+        ).toLocaleDateString([], {
+
+          month: 'short',
+
+          day: 'numeric',
+        }),
 
       fullDate:
 
         new Date(
           entry.created_at
         ).toLocaleString(),
-
-      shortDate:
-
-        new Date(
-          entry.created_at
-        ).toLocaleString([], {
-
-          month: 'short',
-
-          day: 'numeric',
-
-          hour: '2-digit',
-
-          minute: '2-digit',
-
-          second: '2-digit',
-        }),
 
       stress:
         Number(entry.stress_level) || 0,
@@ -102,9 +117,7 @@ export default function AnalyticsPage() {
     })
   )
 
-  // -------------------------
   // AVERAGES
-  // -------------------------
 
   const averageStress =
 
@@ -152,594 +165,735 @@ export default function AnalyticsPage() {
 
   return (
 
-    <main
+    <AuthGuard>
 
-      className="
+      <main
 
-        relative
+        className="
 
-        min-h-screen
+          relative
 
-        px-6 py-10 md:px-20
+          min-h-screen
 
-      "
-    >
+          px-5 py-8
 
-      {/* Glow Background */}
+          sm:px-8
 
-      <div className="fixed inset-0 -z-10 overflow-hidden">
+          md:px-20
 
-        <div
+        "
+      >
 
-          className="
+        {/* Glow */}
 
-            absolute
+        <div className="fixed inset-0 -z-10 overflow-hidden">
 
-            top-[-120px]
-            left-[-120px]
+          <div
 
-            w-[400px]
-            h-[400px]
+            className="
 
-            rounded-full
+              absolute
 
-            bg-blue-400/20
-            dark:bg-blue-500/10
+              top-[-120px]
+              left-[-120px]
 
-            blur-3xl
+              w-[320px]
+              h-[320px]
 
-          "
-        />
+              md:w-[400px]
+              md:h-[400px]
 
-        <div
+              rounded-full
 
-          className="
+              bg-blue-400/20
+              dark:bg-blue-500/10
 
-            absolute
+              blur-3xl
 
-            bottom-[-120px]
-            right-[-120px]
+            "
+          />
 
-            w-[400px]
-            h-[400px]
+          <div
 
-            rounded-full
+            className="
 
-            bg-purple-400/20
-            dark:bg-purple-500/10
+              absolute
 
-            blur-3xl
+              bottom-[-120px]
+              right-[-120px]
 
-          "
-        />
+              w-[320px]
+              h-[320px]
 
-      </div>
+              md:w-[400px]
+              md:h-[400px]
 
-      <Navbar />
+              rounded-full
 
-      {/* Header */}
+              bg-purple-400/20
+              dark:bg-purple-500/10
 
-      <section className="mt-20 mb-16">
+              blur-3xl
 
-        <motion.h1
+            "
+          />
 
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
+        </div>
 
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
+        <Navbar />
 
-          className="
+        {/* Header */}
 
-            text-6xl md:text-7xl
+        <section className="
 
-            font-semibold
+          mt-20
 
-            tracking-tight
+          mb-14
 
-            mb-6
+        ">
 
-          "
-        >
+          <motion.h1
 
-          Emotional Analytics
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
 
-        </motion.h1>
-
-        <motion.p
-
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-
-          transition={{
-            delay: 0.1,
-          }}
-
-          className="
-
-            text-xl
-
-            max-w-2xl
-
-            leading-relaxed
-
-            text-[var(--text-secondary)]
-
-          "
-        >
-
-          Visualize emotional growth,
-          positivity patterns,
-          and mental clarity over time.
-
-        </motion.p>
-
-      </section>
-
-      {/* Circular Stats */}
-
-      <div className="
-
-        grid
-
-        grid-cols-1 md:grid-cols-3
-
-        gap-8
-
-        mb-14
-
-      ">
-
-        {[
-
-          {
-            title: 'Total Entries',
-            value: entries.length,
-            gradient:
-              'from-blue-500/20 to-purple-500/20',
-          },
-
-          {
-            title: 'Average Stress',
-            value: averageStress,
-            gradient:
-              'from-red-500/20 to-orange-500/20',
-          },
-
-          {
-            title: 'Average Positivity',
-            value: averagePositivity,
-            gradient:
-              'from-blue-500/20 to-green-500/20',
-          },
-
-        ].map((card, index) => (
-
-          <motion.div
-
-            key={index}
-
-            whileHover={{
-              scale: 1.03,
+            animate={{
+              opacity: 1,
+              y: 0,
             }}
 
             className="
 
-              rounded-[32px]
+              text-4xl
+              sm:text-5xl
+              md:text-7xl
 
-              p-10
+              font-semibold
 
-              backdrop-blur-2xl
-
-              shadow-sm
-
-              flex flex-col items-center justify-center
-
-            "
-
-            style={{
-
-              background:
-                'var(--card-bg)',
-
-              border:
-                '1px solid var(--border-color)',
-            }}
-          >
-
-            <div className={`
-
-              w-40 h-40
-
-              rounded-full
-
-              flex items-center justify-center
+              tracking-tight
 
               mb-6
 
-              bg-gradient-to-br
+            "
+          >
 
-              ${card.gradient}
+            Emotional Analytics
 
-              border border-white/10
+          </motion.h1>
 
-            `}>
+          <motion.p
 
-              <h2 className="
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
 
-                text-5xl
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
 
-                font-semibold
+            transition={{
+              delay: 0.1,
+            }}
 
-              ">
+            className="
 
-                {card.value}
+              text-base
+              sm:text-lg
+              md:text-xl
 
-              </h2>
+              max-w-2xl
 
-            </div>
+              leading-relaxed
 
-            <p className="
+              text-[var(--text-secondary)]
 
-              text-lg
+            "
+          >
+
+            Visualize your emotional
+            patterns, positivity,
+            and stress trends over time.
+
+          </motion.p>
+
+        </section>
+
+        {/* Loading */}
+
+        {
+
+          loading && (
+
+            <div className="
+
+              py-24
+
+              text-center
 
               text-[var(--text-secondary)]
 
             ">
 
-              {card.title}
+              Loading analytics...
 
-            </p>
+            </div>
+          )
+        }
 
-          </motion.div>
-        ))}
+        {/* Empty */}
 
-      </div>
+        {
 
-      {/* Charts */}
+          !loading &&
 
-      <div className="space-y-10">
+          entries.length === 0 && (
 
-        {/* STRESS */}
+            <div className="
 
-        <motion.div
+              py-28
 
-          whileHover={{
-            scale: 1.01,
-          }}
+              text-center
 
-          className="
+            ">
 
-            rounded-[32px]
+              <h2 className="
 
-            p-8
+                text-3xl
 
-            backdrop-blur-2xl
+                font-semibold
 
-            shadow-sm
+                mb-4
 
-          "
+              ">
 
-          style={{
+                No Analytics Yet
 
-            background:
-              'var(--card-bg)',
+              </h2>
 
-            border:
-              '1px solid var(--border-color)',
-          }}
-        >
+              <p className="
 
-          <h2 className="
+                text-[var(--text-secondary)]
 
-            text-3xl
+              ">
 
-            font-semibold
+                Start journaling to
+                generate emotional insights.
 
-            mb-8
+              </p>
 
-          ">
+            </div>
+          )
+        }
 
-            Stress Trend
+        {
 
-          </h2>
+          entries.length > 0 && (
 
-          <div className="h-[420px]">
+            <>
 
-            <ResponsiveContainer
-              width="100%"
-              height="100%"
-            >
+              {/* Stats */}
 
-              <AreaChart data={chartData}>
+              <div className="
 
-                <defs>
+                grid
 
-                  <linearGradient
+                grid-cols-1
+                md:grid-cols-3
 
-                    id="stressGradient"
+                gap-6
 
-                    x1="0"
-                    y1="0"
+                mb-14
 
-                    x2="0"
-                    y2="1"
+              ">
+
+                {[
+
+                  {
+                    title:
+                      'Total Entries',
+
+                    value:
+                      entries.length,
+
+                    gradient:
+                      'from-blue-500/20 to-purple-500/20',
+                  },
+
+                  {
+                    title:
+                      'Average Stress',
+
+                    value:
+                      averageStress,
+
+                    gradient:
+                      'from-red-500/20 to-orange-500/20',
+                  },
+
+                  {
+                    title:
+                      'Average Positivity',
+
+                    value:
+                      averagePositivity,
+
+                    gradient:
+                      'from-blue-500/20 to-green-500/20',
+                  },
+
+                ].map((card, index) => (
+
+                  <motion.div
+
+                    key={index}
+
+                    whileHover={{
+                      scale: 1.03,
+                    }}
+
+                    className="
+
+                      rounded-[32px]
+
+                      p-6 sm:p-8
+
+                      backdrop-blur-2xl
+
+                      shadow-sm
+
+                      flex flex-col items-center justify-center
+
+                    "
+
+                    style={{
+
+                      background:
+                        'var(--card-bg)',
+
+                      border:
+                        '1px solid var(--border-color)',
+                    }}
                   >
 
-                    <stop
+                    <div className={`
 
-                      offset="0%"
+                      w-28 h-28
+                      sm:w-36 sm:h-36
 
-                      stopColor="#ef4444"
+                      rounded-full
 
-                      stopOpacity={0.5}
+                      flex items-center justify-center
 
-                    />
+                      mb-5
 
-                    <stop
+                      bg-gradient-to-br
 
-                      offset="100%"
+                      ${card.gradient}
 
-                      stopColor="#ef4444"
+                      border border-white/10
 
-                      stopOpacity={0}
+                    `}>
 
-                    />
+                      <h2 className="
 
-                  </linearGradient>
+                        text-3xl
+                        sm:text-5xl
 
-                </defs>
+                        font-semibold
 
-                <CartesianGrid
+                      ">
 
-                  strokeDasharray="3 3"
+                        {card.value}
 
-                  stroke="rgba(120,120,120,0.12)"
+                      </h2>
 
-                />
+                    </div>
 
-                <XAxis
+                    <p className="
 
-                  dataKey="index"
+                      text-base
+                      sm:text-lg
 
-                  tickFormatter={(value) =>
+                      text-center
 
-                    chartData[value]
-                      ?.shortDate || ''
-                  }
+                      text-[var(--text-secondary)]
 
-                  stroke="#888"
+                    ">
 
-                />
+                      {card.title}
 
-                <YAxis stroke="#888" />
+                    </p>
 
-                <Tooltip
+                  </motion.div>
+                ))}
 
-                  labelFormatter={(value) =>
+              </div>
 
-                    chartData[value]
-                      ?.fullDate
-                  }
+              {/* Stress Chart */}
 
-                  formatter={(value) => [
+              <motion.div
 
-                    `${value}`,
+                whileHover={{
+                  scale: 1.01,
+                }}
 
-                    'Stress Level',
-                  ]}
+                className="
 
-                  contentStyle={{
+                  rounded-[32px]
 
-                    background:
-                      'rgba(15,15,15,0.92)',
+                  p-5 sm:p-8
 
-                    border:
-                      '1px solid rgba(255,255,255,0.08)',
+                  backdrop-blur-2xl
 
-                    borderRadius: '20px',
+                  shadow-sm
 
-                    color: 'white',
+                  mb-10
 
-                    backdropFilter:
-                      'blur(20px)',
+                "
 
-                    boxShadow:
-                      '0 10px 40px rgba(0,0,0,0.35)',
-                  }}
-                />
+                style={{
 
-                <Area
+                  background:
+                    'var(--card-bg)',
 
-                  type="monotone"
+                  border:
+                    '1px solid var(--border-color)',
+                }}
+              >
 
-                  dataKey="stress"
+                <h2 className="
 
-                  stroke="#ef4444"
+                  text-2xl
+                  sm:text-3xl
 
-                  fill="url(#stressGradient)"
+                  font-semibold
 
-                  strokeWidth={4}
+                  mb-8
 
-                  activeDot={{
+                ">
 
-                    r: 8,
+                  Stress Trend
 
-                    fill: '#ef4444',
+                </h2>
 
-                    strokeWidth: 4,
+                <div className="
 
-                    stroke: '#fff',
-                  }}
+                  h-[320px]
+                  sm:h-[420px]
 
-                />
+                ">
 
-              </AreaChart>
+                  <ResponsiveContainer
+                    width="100%"
+                    height="100%"
+                  >
 
-            </ResponsiveContainer>
+                    <AreaChart
+                      data={chartData}
+                    >
 
-          </div>
+                      <defs>
 
-        </motion.div>
+                        <linearGradient
 
-        {/* POSITIVITY */}
+                          id="stressGradient"
 
-        <motion.div
+                          x1="0"
+                          y1="0"
 
-          whileHover={{
-            scale: 1.01,
-          }}
+                          x2="0"
+                          y2="1"
+                        >
 
-          className="
+                          <stop
 
-            rounded-[32px]
+                            offset="0%"
 
-            p-8
+                            stopColor="#ef4444"
 
-            backdrop-blur-2xl
+                            stopOpacity={0.5}
 
-            shadow-sm
+                          />
 
-          "
+                          <stop
 
-          style={{
+                            offset="100%"
 
-            background:
-              'var(--card-bg)',
+                            stopColor="#ef4444"
 
-            border:
-              '1px solid var(--border-color)',
-          }}
-        >
+                            stopOpacity={0}
 
-          <h2 className="
+                          />
 
-            text-3xl
+                        </linearGradient>
 
-            font-semibold
+                      </defs>
 
-            mb-8
+                      <CartesianGrid
 
-          ">
+                        strokeDasharray="3 3"
 
-            Positivity Trend
+                        stroke="rgba(120,120,120,0.12)"
 
-          </h2>
+                      />
 
-          <div className="h-[420px]">
+                      <XAxis
 
-            <ResponsiveContainer
-              width="100%"
-              height="100%"
-            >
+                        dataKey="date"
 
-              <LineChart data={chartData}>
+                        stroke="#888"
 
-                <CartesianGrid
+                        tick={{
+                          fontSize: 12,
+                        }}
 
-                  strokeDasharray="3 3"
+                      />
 
-                  stroke="rgba(120,120,120,0.12)"
+                      <YAxis
 
-                />
+                        stroke="#888"
 
-                <XAxis
+                        tick={{
+                          fontSize: 12,
+                        }}
 
-                  dataKey="index"
+                      />
 
-                  tickFormatter={(value) =>
+                      <Tooltip
 
-                    chartData[value]
-                      ?.shortDate || ''
-                  }
+                        formatter={(value) => [
 
-                  stroke="#888"
+                          `${value}`,
 
-                />
+                          'Stress Level',
+                        ]}
 
-                <YAxis stroke="#888" />
+                        labelFormatter={(
+                          label
+                        ) => `Date: ${label}`}
 
-                <Tooltip
+                        contentStyle={{
 
-                  labelFormatter={(value) =>
+                          background:
+                            'rgba(15,15,15,0.92)',
 
-                    chartData[value]
-                      ?.fullDate
-                  }
+                          border:
+                            '1px solid rgba(255,255,255,0.08)',
 
-                  formatter={(value) => [
+                          borderRadius:
+                            '20px',
 
-                    `${value}`,
+                          color: 'white',
 
-                    'Positivity Score',
-                  ]}
+                          backdropFilter:
+                            'blur(20px)',
 
-                  contentStyle={{
+                          boxShadow:
+                            '0 10px 40px rgba(0,0,0,0.35)',
+                        }}
+                      />
 
-                    background:
-                      'rgba(15,15,15,0.92)',
+                      <Area
 
-                    border:
-                      '1px solid rgba(255,255,255,0.08)',
+                        type="monotone"
 
-                    borderRadius: '20px',
+                        dataKey="stress"
 
-                    color: 'white',
+                        stroke="#ef4444"
 
-                    backdropFilter:
-                      'blur(20px)',
+                        fill="url(#stressGradient)"
 
-                    boxShadow:
-                      '0 10px 40px rgba(0,0,0,0.35)',
-                  }}
-                />
+                        strokeWidth={4}
 
-                <Line
+                        activeDot={{
 
-                  type="monotone"
+                          r: 7,
 
-                  dataKey="positivity"
+                          fill: '#ef4444',
 
-                  stroke="#3b82f6"
+                          strokeWidth: 4,
 
-                  strokeWidth={4}
+                          stroke: '#fff',
+                        }}
 
-                  dot={false}
+                      />
 
-                  activeDot={{
+                    </AreaChart>
 
-                    r: 8,
+                  </ResponsiveContainer>
 
-                    fill: '#3b82f6',
+                </div>
 
-                    strokeWidth: 4,
+              </motion.div>
 
-                    stroke: '#fff',
-                  }}
+              {/* Positivity Chart */}
 
-                />
+              <motion.div
 
-              </LineChart>
+                whileHover={{
+                  scale: 1.01,
+                }}
 
-            </ResponsiveContainer>
+                className="
 
-          </div>
+                  rounded-[32px]
 
-        </motion.div>
+                  p-5 sm:p-8
 
-      </div>
+                  backdrop-blur-2xl
 
-    </main>
+                  shadow-sm
+
+                "
+
+                style={{
+
+                  background:
+                    'var(--card-bg)',
+
+                  border:
+                    '1px solid var(--border-color)',
+                }}
+              >
+
+                <h2 className="
+
+                  text-2xl
+                  sm:text-3xl
+
+                  font-semibold
+
+                  mb-8
+
+                ">
+
+                  Positivity Trend
+
+                </h2>
+
+                <div className="
+
+                  h-[320px]
+                  sm:h-[420px]
+
+                ">
+
+                  <ResponsiveContainer
+                    width="100%"
+                    height="100%"
+                  >
+
+                    <LineChart
+                      data={chartData}
+                    >
+
+                      <CartesianGrid
+
+                        strokeDasharray="3 3"
+
+                        stroke="rgba(120,120,120,0.12)"
+
+                      />
+
+                      <XAxis
+
+                        dataKey="date"
+
+                        stroke="#888"
+
+                        tick={{
+                          fontSize: 12,
+                        }}
+
+                      />
+
+                      <YAxis
+
+                        stroke="#888"
+
+                        tick={{
+                          fontSize: 12,
+                        }}
+
+                      />
+
+                      <Tooltip
+
+                        formatter={(value) => [
+
+                          `${value}`,
+
+                          'Positivity Score',
+                        ]}
+
+                        labelFormatter={(
+                          label
+                        ) => `Date: ${label}`}
+
+                        contentStyle={{
+
+                          background:
+                            'rgba(15,15,15,0.92)',
+
+                          border:
+                            '1px solid rgba(255,255,255,0.08)',
+
+                          borderRadius:
+                            '20px',
+
+                          color: 'white',
+
+                          backdropFilter:
+                            'blur(20px)',
+
+                          boxShadow:
+                            '0 10px 40px rgba(0,0,0,0.35)',
+                        }}
+                      />
+
+                      <Line
+
+                        type="monotone"
+
+                        dataKey="positivity"
+
+                        stroke="#3b82f6"
+
+                        strokeWidth={4}
+
+                        dot={false}
+
+                        activeDot={{
+
+                          r: 7,
+
+                          fill: '#3b82f6',
+
+                          strokeWidth: 4,
+
+                          stroke: '#fff',
+                        }}
+
+                      />
+
+                    </LineChart>
+
+                  </ResponsiveContainer>
+
+                </div>
+
+              </motion.div>
+
+            </>
+          )
+        }
+
+      </main>
+
+    </AuthGuard>
   )
 }

@@ -2,33 +2,99 @@
 
 import Link from 'next/link'
 
-import { usePathname } from 'next/navigation'
+import {
 
-import { motion } from 'framer-motion'
+  useEffect,
 
-import ThemeToggle from './ThemeToggle'
+  useState,
+
+} from 'react'
+
+import {
+
+  motion,
+
+} from 'framer-motion'
+
+import {
+
+  Moon,
+
+  Sun,
+
+  LogOut,
+
+} from 'lucide-react'
+
+import {
+
+  useRouter,
+
+} from 'next/navigation'
+
+import { supabase } from '@/lib/supabase'
 
 export default function Navbar() {
 
-  const pathname = usePathname()
+  const router = useRouter()
 
-  const navLinks = [
+  const [dark, setDark] =
+    useState(true)
 
-    {
-      name: 'Journal',
-      href: '/journal',
-    },
+  useEffect(() => {
 
-    {
-      name: 'Timeline',
-      href: '/timeline',
-    },
+    const savedTheme =
+      localStorage.getItem('theme')
 
-    {
-      name: 'Analytics',
-      href: '/analytics',
-    },
-  ]
+    if (savedTheme === 'light') {
+
+      document.documentElement
+        .classList.remove('dark')
+
+      setDark(false)
+
+    } else {
+
+      document.documentElement
+        .classList.add('dark')
+
+      setDark(true)
+    }
+
+  }, [])
+
+  const toggleTheme = () => {
+
+    if (dark) {
+
+      document.documentElement
+        .classList.remove('dark')
+
+      localStorage.setItem(
+        'theme',
+        'light'
+      )
+
+    } else {
+
+      document.documentElement
+        .classList.add('dark')
+
+      localStorage.setItem(
+        'theme',
+        'dark'
+      )
+    }
+
+    setDark(!dark)
+  }
+
+  const logout = async () => {
+
+    await supabase.auth.signOut()
+
+    router.push('/auth')
+  }
 
   return (
 
@@ -44,130 +110,142 @@ export default function Navbar() {
         y: 0,
       }}
 
-      transition={{
-        duration: 0.5,
-      }}
-
       className="
 
-        sticky top-6 z-50
+        fixed
 
-        flex items-center justify-between
+        top-5 left-1/2
 
-        px-6 py-4
+        -translate-x-1/2
+
+        z-50
+
+        w-[95%]
+        max-w-6xl
+
+        px-5 py-4
 
         rounded-[28px]
 
-        border border-[var(--border)]
-
-        bg-[var(--card)]
-
         backdrop-blur-2xl
 
-        shadow-sm
+        border
+
+        flex items-center justify-between
 
       "
+
+      style={{
+
+        background:
+          'var(--card-bg)',
+
+        borderColor:
+          'var(--border-color)',
+      }}
     >
 
       {/* Logo */}
 
-      <Link
+      <Link href="/journal">
 
-        href="/journal"
+        <h1 className="
 
-        className="
+          text-lg sm:text-xl
 
-          text-2xl md:text-3xl
           font-semibold
-          tracking-tight
-
-        "
-      >
-
-        AI Journal
-
-      </Link>
-
-      {/* Navigation */}
-
-      <div className="flex items-center gap-3">
-
-        <div className="
-
-          flex items-center gap-2
-
-          p-1.5
-
-          rounded-2xl
-
-          bg-black/[0.03]
-          dark:bg-white/[0.03]
 
         ">
 
-          {navLinks.map((link) => {
+          MindFrame
 
-            const isActive =
-              pathname === link.href
+        </h1>
 
-            return (
+      </Link>
 
-              <Link
+      {/* Links */}
 
-                key={link.href}
+      <div className="
 
-                href={link.href}
+        flex items-center gap-5
 
-                className={`
+        text-sm sm:text-base
 
-                  px-4 py-2.5
+      ">
 
-                  rounded-xl
+        <Link href="/journal">
+          Journal
+        </Link>
 
-                  text-sm
-                  font-medium
+        <Link href="/timeline">
+          Timeline
+        </Link>
 
-                  transition-all duration-300
+        <Link href="/analytics">
+          Analytics
+        </Link>
 
-                  ${
+      </div>
 
-                    isActive
+      {/* Right */}
 
-                      ? `
+      <div className="
 
-                        bg-black
-                        text-white
+        flex items-center gap-2
 
-                        dark:bg-white
-                        dark:text-black
+      ">
 
-                      `
+        {/* Theme */}
 
-                      : `
+        <button
 
-                        text-zinc-500
-                        dark:text-zinc-400
+          onClick={toggleTheme}
 
-                        hover:text-black
-                        dark:hover:text-white
+          className="
 
-                      `
-                  }
+            w-11 h-11
 
-                `}
-              >
+            rounded-2xl
 
-                {link.name}
+            flex items-center justify-center
 
-              </Link>
-            )
-          })}
+          "
+        >
 
-        </div>
+          {
 
-        {/* Theme Toggle */}
+            dark
 
-        <ThemeToggle />
+              ? <Sun size={18} />
+
+              : <Moon size={18} />
+
+          }
+
+        </button>
+
+        {/* Logout */}
+
+        <button
+
+          onClick={logout}
+
+          className="
+
+            w-11 h-11
+
+            rounded-2xl
+
+            flex items-center justify-center
+
+            text-red-500
+
+          "
+        >
+
+          <LogOut size={18} />
+
+        </button>
 
       </div>
 

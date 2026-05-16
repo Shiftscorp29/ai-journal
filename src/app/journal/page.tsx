@@ -7,27 +7,35 @@ import { motion } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 
 import Navbar from '@/components/Navbar'
+
 import Moodboard from '@/components/Moodboard'
+
+import AuthGuard from '@/components/AuthGuard'
 
 export default function JournalPage() {
 
-  const [text, setText] = useState('')
+  const [text, setText] =
+    useState('')
 
-  const [result, setResult] = useState('')
+  const [result, setResult] =
+    useState('')
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] =
+    useState(false)
 
   const [themes, setThemes] =
     useState<string[]>([])
 
   const wordCount =
 
-    text.split(' ').filter(Boolean).length
+    text.split(' ').filter(Boolean)
+      .length
 
-  const emotionalIntensity = Math.min(
-    100,
-    text.length / 5
-  )
+  const emotionalIntensity =
+    Math.min(
+      100,
+      text.length / 5
+    )
 
   const analyzeJournal = async () => {
 
@@ -37,20 +45,44 @@ export default function JournalPage() {
 
       setLoading(true)
 
-      const response = await fetch('/api/analyze', {
+      // GET USER
 
-        method: 'POST',
+      const {
 
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        data: { user },
 
-        body: JSON.stringify({
-          text,
-        }),
-      })
+      } = await supabase.auth.getUser()
 
-      const data = await response.json()
+      if (!user) {
+
+        alert(
+          'Please login first.'
+        )
+
+        return
+      }
+
+      // AI REQUEST
+
+      const response = await fetch(
+        '/api/analyze',
+        {
+
+          method: 'POST',
+
+          headers: {
+            'Content-Type':
+              'application/json',
+          },
+
+          body: JSON.stringify({
+            text,
+          }),
+        }
+      )
+
+      const data =
+        await response.json()
 
       setResult(data.result)
 
@@ -75,8 +107,6 @@ export default function JournalPage() {
         data.result.match(
           /Positivity Score[^0-9]*(\d+)/i
         )
-
-      // FIXED SINGLE LINE THEMES
 
       const themesMatch =
 
@@ -114,8 +144,6 @@ export default function JournalPage() {
 
           : 50
 
-      // CLEAN THEMES
-
       const cleanThemes =
 
         themesMatch?.[1]
@@ -132,31 +160,37 @@ export default function JournalPage() {
 
       setThemes(cleanThemes)
 
-      // -------------------------
       // SAVE TO SUPABASE
-      // -------------------------
 
-      const { error } = await supabase
+      const { error } =
+        await supabase
 
-        .from('entries')
+          .from('entries')
 
-        .insert([
+          .insert([
 
-          {
-            content: text,
+            {
+              user_id: user.id,
 
-            ai_response: data.result,
+              content: text,
 
-            mood,
+              ai_response:
+                data.result,
 
-            stress_level: stressLevel,
+              mood,
 
-            positivity_score: positivityScore,
+              stress_level:
+                stressLevel,
 
-            themes:
-              cleanThemes.join(', '),
-          },
-        ])
+              positivity_score:
+                positivityScore,
+
+              themes:
+                cleanThemes.join(
+                  ', '
+                ),
+            },
+          ])
 
       if (error) {
 
@@ -181,338 +215,96 @@ export default function JournalPage() {
 
   return (
 
-    <main
+    <AuthGuard>
 
-      className="
-
-        relative
-
-        min-h-screen
-
-        px-6 py-10 md:px-20
-
-        transition-all duration-700
-
-      "
-    >
-
-      {/* Glow */}
-
-      <div className="fixed inset-0 -z-10 overflow-hidden">
-
-        <div
-
-          className="
-
-            absolute
-
-            top-[-120px]
-            left-[-120px]
-
-            w-[400px]
-            h-[400px]
-
-            rounded-full
-
-            bg-blue-400/20
-            dark:bg-blue-500/10
-
-            blur-3xl
-
-          "
-        />
-
-        <div
-
-          className="
-
-            absolute
-
-            bottom-[-120px]
-            right-[-120px]
-
-            w-[400px]
-            h-[400px]
-
-            rounded-full
-
-            bg-purple-400/20
-            dark:bg-purple-500/10
-
-            blur-3xl
-
-          "
-        />
-
-      </div>
-
-      <Navbar />
-
-      {/* Hero */}
-
-      <section className="mt-20 mb-16">
-
-        <motion.h1
-
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-
-          transition={{
-            duration: 0.5,
-          }}
-
-          className="
-
-            text-6xl md:text-7xl
-
-            font-semibold
-
-            tracking-tight
-
-            mb-6
-
-          "
-        >
-
-          Reflect.
-
-          <br />
-
-          Understand.
-
-        </motion.h1>
-
-        <motion.p
-
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-
-          transition={{
-            duration: 0.7,
-          }}
-
-          className="
-
-            text-xl
-
-            max-w-2xl
-
-            leading-relaxed
-
-            text-[var(--text-secondary)]
-
-          "
-        >
-
-          Transform your thoughts into cinematic emotional reflections powered by AI.
-
-        </motion.p>
-
-      </section>
-
-      {/* Journal Card */}
-
-      <motion.div
-
-        initial={{
-          opacity: 0,
-          y: 20,
-        }}
-
-        animate={{
-          opacity: 1,
-          y: 0,
-        }}
+      <main
 
         className="
 
-          rounded-[32px]
+          relative
 
-          border
+          min-h-screen
 
-          backdrop-blur-2xl
+          px-5 py-8
 
-          shadow-sm
+          sm:px-8
 
-          p-8
+          md:px-20
+
+          transition-all duration-700
 
         "
-
-        style={{
-
-          background:
-            'var(--card-bg)',
-
-          borderColor:
-            'var(--border-color)',
-        }}
       >
 
-        <textarea
+        {/* Background Glow */}
 
-          value={text}
+        <div className="fixed inset-0 -z-10 overflow-hidden">
 
-          onChange={(e) =>
-            setText(e.target.value)
-          }
+          <div
 
-          placeholder="Write your thoughts..."
+            className="
 
-          className="
+              absolute
 
-            w-full
+              top-[-120px]
+              left-[-120px]
 
-            h-[320px]
+              w-[320px]
+              h-[320px]
 
-            bg-transparent
+              md:w-[400px]
+              md:h-[400px]
 
-            resize-none
-            outline-none
+              rounded-full
 
-            text-lg
+              bg-blue-400/20
+              dark:bg-blue-500/10
 
-            leading-relaxed
+              blur-3xl
 
-            text-[var(--text-primary)]
+            "
+          />
 
-            placeholder:text-zinc-400
-            dark:placeholder:text-zinc-600
+          <div
 
-          "
-        />
+            className="
 
-        {/* Stats */}
+              absolute
 
-        <div className="mt-6">
+              bottom-[-120px]
+              right-[-120px]
 
-          <div className="
+              w-[320px]
+              h-[320px]
 
-            flex items-center justify-between
+              md:w-[400px]
+              md:h-[400px]
 
-            text-sm
+              rounded-full
 
-            text-[var(--text-secondary)]
+              bg-purple-400/20
+              dark:bg-purple-500/10
 
-          ">
+              blur-3xl
 
-            <span>
-
-              {wordCount} words
-
-            </span>
-
-            <span>
-
-              Emotional Intensity
-
-            </span>
-
-          </div>
-
-          <div className="
-
-            mt-3
-
-            w-full h-2
-
-            rounded-full
-
-            overflow-hidden
-
-            bg-black/[0.05]
-            dark:bg-white/[0.05]
-
-          ">
-
-            <motion.div
-
-              animate={{
-                width: `${emotionalIntensity}%`,
-              }}
-
-              className="
-
-                h-full
-
-                bg-black
-                dark:bg-white
-
-              "
-            />
-
-          </div>
+            "
+          />
 
         </div>
 
-        {/* Button */}
+        <Navbar />
 
-        <button
+        {/* Hero */}
 
-          onClick={analyzeJournal}
+        <section className="
 
-          disabled={loading}
+          mt-20
 
-          className="
+          mb-14
 
-            mt-8
+        ">
 
-            px-8 py-4
-
-            rounded-2xl
-
-            bg-black
-            text-white
-
-            dark:bg-white
-            dark:text-black
-
-            font-medium
-
-            hover:scale-[1.02]
-            active:scale-[0.98]
-
-            transition-all duration-300
-
-            disabled:opacity-50
-
-          "
-        >
-
-          {
-
-            loading
-
-              ? 'AI is reflecting...'
-
-              : 'Analyze Emotion'
-
-          }
-
-        </button>
-
-      </motion.div>
-
-      {/* Emotional Themes */}
-
-      {
-
-        themes.length > 0 && (
-
-          <motion.div
+          <motion.h1
 
             initial={{
               opacity: 0,
@@ -524,113 +316,79 @@ export default function JournalPage() {
               y: 0,
             }}
 
+            transition={{
+              duration: 0.5,
+            }}
+
             className="
 
-              mt-10
-
-              rounded-[32px]
-
-              p-8
-
-              backdrop-blur-2xl
-
-              shadow-sm
-
-            "
-
-            style={{
-
-              background:
-                'var(--card-bg)',
-
-              border:
-                '1px solid var(--border-color)',
-            }}
-          >
-
-            <h2 className="
-
-              text-3xl
+              text-4xl
+              sm:text-5xl
+              md:text-7xl
 
               font-semibold
 
+              tracking-tight
+
               mb-6
 
-            ">
+            "
+          >
 
-              Emotional Themes
+            Reflect.
 
-            </h2>
+            <br />
 
-            <div className="
+            Understand.
 
-              flex flex-wrap gap-4
+          </motion.h1>
 
-            ">
+          <motion.p
 
-              {
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
 
-                themes.map(
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
 
-                  (
-                    theme,
-                    index
-                  ) => (
+            transition={{
+              duration: 0.7,
+            }}
 
-                    <motion.div
+            className="
 
-                      key={index}
+              text-base
+              sm:text-lg
+              md:text-xl
 
-                      whileHover={{
-                        scale: 1.05,
-                      }}
+              max-w-2xl
 
-                      className="
+              leading-relaxed
 
-                        px-5 py-3
+              text-[var(--text-secondary)]
 
-                        rounded-2xl
+            "
+          >
 
-                        text-sm
+            Transform your thoughts
+            into cinematic emotional
+            reflections powered by AI.
 
-                        backdrop-blur-xl
+          </motion.p>
 
-                        border
+        </section>
 
-                        bg-black/[0.04]
-                        dark:bg-white/[0.05]
-
-                      "
-
-                      style={{
-
-                        borderColor:
-                          'var(--border-color)',
-                      }}
-                    >
-
-                      {theme}
-
-                    </motion.div>
-                  )
-                )
-              }
-
-            </div>
-
-          </motion.div>
-        )
-      }
-
-      {/* Reflection */}
-
-      {result && (
+        {/* Journal Card */}
 
         <motion.div
 
           initial={{
             opacity: 0,
-            y: 30,
+            y: 20,
           }}
 
           animate={{
@@ -640,15 +398,15 @@ export default function JournalPage() {
 
           className="
 
-            mt-12
-
             rounded-[32px]
+
+            border
 
             backdrop-blur-2xl
 
             shadow-sm
 
-            p-8
+            p-5 sm:p-8
 
           "
 
@@ -657,51 +415,380 @@ export default function JournalPage() {
             background:
               'var(--card-bg)',
 
-            border:
-              '1px solid var(--border-color)',
+            borderColor:
+              'var(--border-color)',
           }}
         >
 
-          <h2 className="
+          <textarea
 
-            text-3xl
+            value={text}
 
-            font-semibold
+            onChange={(e) =>
+              setText(
+                e.target.value
+              )
+            }
 
-            mb-6
+            placeholder="Write your thoughts..."
 
-          ">
+            className="
 
-            AI Reflection
+              w-full
 
-          </h2>
+              h-[260px]
+              sm:h-[320px]
 
-          <div className="
+              bg-transparent
 
-            whitespace-pre-wrap
+              resize-none
 
-            leading-relaxed
+              outline-none
 
-            text-lg
+              text-base
+              sm:text-lg
 
-            text-[var(--text-secondary)]
+              leading-relaxed
 
-          ">
+              text-[var(--text-primary)]
 
-            {result}
+              placeholder:text-zinc-400
+              dark:placeholder:text-zinc-600
+
+            "
+          />
+
+          {/* Stats */}
+
+          <div className="mt-6">
+
+            <div
+
+              className="
+
+                flex items-center justify-between
+
+                text-xs
+                sm:text-sm
+
+                text-[var(--text-secondary)]
+
+              "
+            >
+
+              <span>
+
+                {wordCount} words
+
+              </span>
+
+              <span>
+
+                Emotional Intensity
+
+              </span>
+
+            </div>
+
+            <div
+
+              className="
+
+                mt-3
+
+                w-full h-2
+
+                rounded-full
+
+                overflow-hidden
+
+                bg-black/[0.05]
+                dark:bg-white/[0.05]
+
+              "
+            >
+
+              <motion.div
+
+                animate={{
+                  width:
+                    `${emotionalIntensity}%`,
+                }}
+
+                className="
+
+                  h-full
+
+                  bg-black
+                  dark:bg-white
+
+                "
+              />
+
+            </div>
 
           </div>
 
+          {/* Button */}
+
+          <button
+
+            onClick={analyzeJournal}
+
+            disabled={loading}
+
+            className="
+
+              mt-8
+
+              w-full sm:w-auto
+
+              px-8 py-4
+
+              rounded-2xl
+
+              bg-black
+              text-white
+
+              dark:bg-white
+              dark:text-black
+
+              font-medium
+
+              hover:scale-[1.02]
+              active:scale-[0.98]
+
+              transition-all duration-300
+
+              disabled:opacity-50
+
+            "
+          >
+
+            {
+
+              loading
+
+                ? 'AI is reflecting...'
+
+                : 'Analyze Emotion'
+
+            }
+
+          </button>
+
         </motion.div>
-      )}
 
-      {/* Moodboard */}
+        {/* Themes */}
 
-      {result && (
+        {
 
-        <Moodboard result={result} />
-      )}
+          themes.length > 0 && (
 
-    </main>
+            <motion.div
+
+              initial={{
+                opacity: 0,
+                y: 20,
+              }}
+
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+
+              className="
+
+                mt-10
+
+                rounded-[32px]
+
+                p-5 sm:p-8
+
+                backdrop-blur-2xl
+
+                shadow-sm
+
+              "
+
+              style={{
+
+                background:
+                  'var(--card-bg)',
+
+                border:
+                  '1px solid var(--border-color)',
+              }}
+            >
+
+              <h2 className="
+
+                text-2xl
+                sm:text-3xl
+
+                font-semibold
+
+                mb-6
+
+              ">
+
+                Emotional Themes
+
+              </h2>
+
+              <div className="
+
+                flex flex-wrap gap-3
+
+              ">
+
+                {
+
+                  themes.map(
+
+                    (
+                      theme,
+                      index
+                    ) => (
+
+                      <motion.div
+
+                        key={index}
+
+                        whileHover={{
+                          scale: 1.05,
+                        }}
+
+                        className="
+
+                          px-4 py-2
+
+                          sm:px-5 sm:py-3
+
+                          rounded-2xl
+
+                          text-xs
+                          sm:text-sm
+
+                          backdrop-blur-xl
+
+                          border
+
+                          bg-black/[0.04]
+                          dark:bg-white/[0.05]
+
+                        "
+
+                        style={{
+
+                          borderColor:
+                            'var(--border-color)',
+                        }}
+                      >
+
+                        {theme}
+
+                      </motion.div>
+                    )
+                  )
+                }
+
+              </div>
+
+            </motion.div>
+          )
+        }
+
+        {/* Reflection */}
+
+        {
+
+          result && (
+
+            <motion.div
+
+              initial={{
+                opacity: 0,
+                y: 30,
+              }}
+
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+
+              className="
+
+                mt-12
+
+                rounded-[32px]
+
+                backdrop-blur-2xl
+
+                shadow-sm
+
+                p-5 sm:p-8
+
+              "
+
+              style={{
+
+                background:
+                  'var(--card-bg)',
+
+                border:
+                  '1px solid var(--border-color)',
+              }}
+            >
+
+              <h2 className="
+
+                text-2xl
+                sm:text-3xl
+
+                font-semibold
+
+                mb-6
+
+              ">
+
+                AI Reflection
+
+              </h2>
+
+              <div className="
+
+                whitespace-pre-wrap
+
+                leading-relaxed
+
+                text-sm
+                sm:text-lg
+
+                text-[var(--text-secondary)]
+
+              ">
+
+                {result}
+
+              </div>
+
+            </motion.div>
+          )
+        }
+
+        {/* Moodboard */}
+
+        {
+
+          result && (
+
+            <Moodboard result={result} />
+          )
+        }
+
+      </main>
+
+    </AuthGuard>
   )
 }

@@ -18,10 +18,15 @@ import { supabase } from '@/lib/supabase'
 
 import Navbar from '@/components/Navbar'
 
+import AuthGuard from '@/components/AuthGuard'
+
 export default function TimelinePage() {
 
   const [entries, setEntries] =
     useState<any[]>([])
+
+  const [loading, setLoading] =
+    useState(true)
 
   const [deletingId, setDeletingId] =
     useState<string | null>(null)
@@ -34,19 +39,42 @@ export default function TimelinePage() {
 
   const fetchEntries = async () => {
 
-    const { data, error } = await supabase
+    try {
 
-      .from('entries')
+      const {
 
-      .select('*')
+        data: { user },
 
-      .order('created_at', {
-        ascending: false,
-      })
+      } = await supabase.auth.getUser()
 
-    if (!error) {
+      if (!user) return
 
-      setEntries(data || [])
+      const { data, error } =
+        await supabase
+
+          .from('entries')
+
+          .select('*')
+
+          .eq('user_id', user.id)
+
+          .order('created_at', {
+
+            ascending: false,
+          })
+
+      if (!error) {
+
+        setEntries(data || [])
+      }
+
+    } catch (error) {
+
+      console.log(error)
+
+    } finally {
+
+      setLoading(false)
     }
   }
 
@@ -58,13 +86,14 @@ export default function TimelinePage() {
 
       setDeletingId(id)
 
-      const { error } = await supabase
+      const { error } =
+        await supabase
 
-        .from('entries')
+          .from('entries')
 
-        .delete()
+          .delete()
 
-        .eq('id', id)
+          .eq('id', id)
 
       if (!error) {
 
@@ -89,152 +118,98 @@ export default function TimelinePage() {
 
   return (
 
-    <main
+    <AuthGuard>
 
-      className="
+      <main
 
-        relative
+        className="
 
-        min-h-screen
+          relative
 
-        px-6 py-10 md:px-20
+          min-h-screen
 
-      "
-    >
+          px-5 py-8
 
-      {/* Glow Background */}
+          sm:px-8
 
-      <div className="fixed inset-0 -z-10 overflow-hidden">
+          md:px-20
 
-        <div
+        "
+      >
 
-          className="
+        {/* Background Glow */}
 
-            absolute
+        <div className="fixed inset-0 -z-10 overflow-hidden">
 
-            top-[-120px]
-            left-[-120px]
+          <div
 
-            w-[400px]
-            h-[400px]
+            className="
 
-            rounded-full
+              absolute
 
-            bg-blue-400/20
-            dark:bg-blue-500/10
+              top-[-120px]
+              left-[-120px]
 
-            blur-3xl
+              w-[320px]
+              h-[320px]
 
-          "
-        />
+              md:w-[400px]
+              md:h-[400px]
 
-        <div
+              rounded-full
 
-          className="
+              bg-blue-400/20
+              dark:bg-blue-500/10
 
-            absolute
+              blur-3xl
 
-            bottom-[-120px]
-            right-[-120px]
+            "
+          />
 
-            w-[400px]
-            h-[400px]
+          <div
 
-            rounded-full
+            className="
 
-            bg-purple-400/20
-            dark:bg-purple-500/10
+              absolute
 
-            blur-3xl
+              bottom-[-120px]
+              right-[-120px]
 
-          "
-        />
+              w-[320px]
+              h-[320px]
 
-      </div>
+              md:w-[400px]
+              md:h-[400px]
 
-      <Navbar />
+              rounded-full
 
-      {/* Header */}
+              bg-purple-400/20
+              dark:bg-purple-500/10
 
-      <section className="mt-20 mb-16">
+              blur-3xl
 
-        <motion.h1
+            "
+          />
 
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
+        </div>
 
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
+        <Navbar />
 
-          className="
+        {/* Header */}
 
-            text-6xl md:text-7xl
+        <section className="
 
-            font-semibold
+          mt-20
 
-            tracking-tight
+          mb-14
 
-            mb-6
+        ">
 
-          "
-        >
-
-          Your Timeline
-
-        </motion.h1>
-
-        <motion.p
-
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-
-          transition={{
-            delay: 0.1,
-          }}
-
-          className="
-
-            text-xl
-
-            max-w-2xl
-
-            leading-relaxed
-
-            text-[var(--text-secondary)]
-
-          "
-        >
-
-          Emotional reflections and personal growth captured through time.
-
-        </motion.p>
-
-      </section>
-
-      {/* Timeline */}
-
-      <div className="space-y-8">
-
-        {entries.map((entry, index) => (
-
-          <motion.div
-
-            key={entry.id}
+          <motion.h1
 
             initial={{
               opacity: 0,
-              y: 30,
+              y: 20,
             }}
 
             animate={{
@@ -242,425 +217,649 @@ export default function TimelinePage() {
               y: 0,
             }}
 
-            whileHover={{
-              scale: 1.01,
+            className="
+
+              text-4xl
+              sm:text-5xl
+              md:text-7xl
+
+              font-semibold
+
+              tracking-tight
+
+              mb-6
+
+            "
+          >
+
+            Your Timeline
+
+          </motion.h1>
+
+          <motion.p
+
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
+
+            animate={{
+              opacity: 1,
+              y: 0,
             }}
 
             transition={{
-              duration: 0.3,
-              delay: index * 0.05,
+              delay: 0.1,
             }}
 
             className="
 
-              rounded-[32px]
+              text-base
+              sm:text-lg
+              md:text-xl
 
-              backdrop-blur-2xl
+              max-w-2xl
 
-              shadow-sm
+              leading-relaxed
 
-              p-8
+              text-[var(--text-secondary)]
 
             "
-
-            style={{
-
-              background:
-                'var(--card-bg)',
-
-              border:
-                '1px solid var(--border-color)',
-            }}
           >
 
-            {/* Top */}
+            A cinematic archive of your
+            emotions, reflections,
+            and personal growth.
+
+          </motion.p>
+
+        </section>
+
+        {/* Loading */}
+
+        {
+
+          loading && (
 
             <div className="
 
-              flex items-start justify-between
+              py-24
 
-              mb-8
+              text-center
 
-              gap-4
+              text-[var(--text-secondary)]
 
             ">
 
-              <div>
-
-                <h2 className="
-
-                  text-3xl
-
-                  font-semibold
-
-                  mb-2
-
-                ">
-
-                  {entry.mood}
-
-                </h2>
-
-                <p className="
-
-                  text-sm
-
-                  text-[var(--text-secondary)]
-
-                ">
-
-                  {
-
-                    new Date(
-                      entry.created_at
-                    ).toLocaleString()
-
-                  }
-
-                </p>
-
-              </div>
-
-              {/* Delete */}
-
-              <button
-
-                onClick={() =>
-                  deleteEntry(entry.id)
-                }
-
-                disabled={
-                  deletingId === entry.id
-                }
-
-                className="
-
-                  w-11 h-11
-
-                  rounded-2xl
-
-                  flex items-center justify-center
-
-                  bg-red-500/10
-
-                  hover:bg-red-500/20
-
-                  hover:scale-110
-
-                  transition-all duration-300
-
-                "
-              >
-
-                <Trash2
-
-                  size={18}
-
-                  className="text-red-500"
-
-                />
-
-              </button>
+              Loading timeline...
 
             </div>
+          )
+        }
 
-            {/* Analytics */}
+        {/* Empty */}
+
+        {
+
+          !loading &&
+
+          entries.length === 0 && (
 
             <div className="
 
-              grid
+              py-28
 
-              grid-cols-1 md:grid-cols-2
-
-              gap-6
-
-              mb-10
+              text-center
 
             ">
 
-              {/* Stress */}
+              <h2 className="
+
+                text-3xl
+
+                font-semibold
+
+                mb-4
+
+              ">
+
+                No Journal Entries Yet
+
+              </h2>
+
+              <p className="
+
+                text-[var(--text-secondary)]
+
+              ">
+
+                Your emotional journey
+                will appear here.
+
+              </p>
+
+            </div>
+          )
+        }
+
+        {/* Timeline */}
+
+        <div className="space-y-8">
+
+          {
+
+            entries.map((entry, index) => (
 
               <motion.div
 
+                key={entry.id}
+
+                initial={{
+                  opacity: 0,
+                  y: 30,
+                }}
+
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+
+                transition={{
+                  duration: 0.3,
+                  delay: index * 0.05,
+                }}
+
                 whileHover={{
-                  scale: 1.03,
+                  scale: 1.01,
                 }}
 
                 className="
 
-                  rounded-[30px]
+                  rounded-[32px]
 
-                  p-7
+                  backdrop-blur-2xl
 
-                  overflow-hidden
+                  shadow-sm
 
-                  relative
-
-                  bg-gradient-to-br
-
-                  from-red-500/10
-                  to-orange-500/10
-
-                  border border-red-500/10
+                  p-5 sm:p-8
 
                 "
+
+                style={{
+
+                  background:
+                    'var(--card-bg)',
+
+                  border:
+                    '1px solid var(--border-color)',
+                }}
               >
+
+                {/* Top */}
 
                 <div className="
 
-                  flex items-center gap-4
+                  flex flex-col sm:flex-row
 
-                  mb-6
+                  sm:items-start
+                  sm:justify-between
+
+                  gap-5
+
+                  mb-8
 
                 ">
 
-                  <div className="
+                  <div>
 
-                    w-14 h-14
+                    <h2 className="
 
-                    rounded-2xl
+                      text-2xl
+                      sm:text-3xl
 
-                    flex items-center justify-center
+                      font-semibold
 
-                    bg-red-500/15
+                      mb-2
 
-                  ">
+                    ">
 
-                    <Flame
+                      {entry.mood}
 
-                      size={24}
+                    </h2>
+
+                    <p className="
+
+                      text-sm
+
+                      text-[var(--text-secondary)]
+
+                    ">
+
+                      {
+
+                        new Date(
+                          entry.created_at
+                        ).toLocaleString()
+
+                      }
+
+                    </p>
+
+                  </div>
+
+                  {/* Delete */}
+
+                  <button
+
+                    onClick={() =>
+                      deleteEntry(entry.id)
+                    }
+
+                    disabled={
+                      deletingId === entry.id
+                    }
+
+                    className="
+
+                      w-11 h-11
+
+                      rounded-2xl
+
+                      flex items-center justify-center
+
+                      bg-red-500/10
+
+                      hover:bg-red-500/20
+
+                      transition-all duration-300
+
+                    "
+                  >
+
+                    <Trash2
+
+                      size={18}
 
                       className="text-red-500"
 
                     />
 
-                  </div>
-
-                  <div>
-
-                    <p className="
-
-                      text-sm
-
-                      text-[var(--text-secondary)]
-
-                    ">
-
-                      Stress Level
-
-                    </p>
-
-                    <h3 className="
-
-                      text-4xl
-
-                      font-semibold
-
-                    ">
-
-                      {
-
-                        entry.stress_level || 0
-
-                      }
-
-                    </h3>
-
-                  </div>
+                  </button>
 
                 </div>
 
+                {/* Stats */}
+
                 <div className="
 
-                  w-full h-3
+                  grid
 
-                  rounded-full
+                  grid-cols-1
+                  lg:grid-cols-2
 
-                  overflow-hidden
+                  gap-5
 
-                  bg-black/[0.05]
-                  dark:bg-white/[0.05]
+                  mb-10
 
                 ">
 
+                  {/* Stress */}
+
                   <motion.div
 
-                    initial={{
-                      width: 0,
-                    }}
-
-                    animate={{
-                      width:
-                        `${entry.stress_level}%`,
-                    }}
-
-                    transition={{
-                      duration: 1,
+                    whileHover={{
+                      scale: 1.02,
                     }}
 
                     className="
 
-                      h-full
+                      rounded-[28px]
+
+                      p-6
+
+                      bg-gradient-to-br
+
+                      from-red-500/10
+                      to-orange-500/10
+
+                      border border-red-500/10
+
+                    "
+                  >
+
+                    <div className="
+
+                      flex items-center gap-4
+
+                      mb-5
+
+                    ">
+
+                      <div className="
+
+                        w-12 h-12
+
+                        rounded-2xl
+
+                        flex items-center justify-center
+
+                        bg-red-500/15
+
+                      ">
+
+                        <Flame
+
+                          size={22}
+
+                          className="text-red-500"
+
+                        />
+
+                      </div>
+
+                      <div>
+
+                        <p className="
+
+                          text-sm
+
+                          text-[var(--text-secondary)]
+
+                        ">
+
+                          Stress Level
+
+                        </p>
+
+                        <h3 className="
+
+                          text-3xl
+
+                          font-semibold
+
+                        ">
+
+                          {
+
+                            entry.stress_level || 0
+
+                          }
+
+                        </h3>
+
+                      </div>
+
+                    </div>
+
+                    <div className="
+
+                      w-full h-3
 
                       rounded-full
 
-                      bg-gradient-to-r
+                      overflow-hidden
 
-                      from-red-500
-                      to-orange-500
-
-                    "
-                  />
-
-                </div>
-
-              </motion.div>
-
-              {/* Positivity */}
-
-              <motion.div
-
-                whileHover={{
-                  scale: 1.03,
-                }}
-
-                className="
-
-                  rounded-[30px]
-
-                  p-7
-
-                  overflow-hidden
-
-                  relative
-
-                  bg-gradient-to-br
-
-                  from-blue-500/10
-                  to-green-500/10
-
-                  border border-blue-500/10
-
-                "
-              >
-
-                <div className="
-
-                  flex items-center gap-4
-
-                  mb-6
-
-                ">
-
-                  <div className="
-
-                    w-14 h-14
-
-                    rounded-2xl
-
-                    flex items-center justify-center
-
-                    bg-blue-500/15
-
-                  ">
-
-                    <Heart
-
-                      size={24}
-
-                      className="text-blue-500"
-
-                    />
-
-                  </div>
-
-                  <div>
-
-                    <p className="
-
-                      text-sm
-
-                      text-[var(--text-secondary)]
+                      bg-black/[0.05]
+                      dark:bg-white/[0.05]
 
                     ">
 
-                      Positivity
+                      <motion.div
 
-                    </p>
+                        initial={{
+                          width: 0,
+                        }}
 
-                    <h3 className="
+                        animate={{
+                          width:
+                            `${entry.stress_level}%`,
+                        }}
 
-                      text-4xl
+                        transition={{
+                          duration: 1,
+                        }}
 
-                      font-semibold
+                        className="
 
-                    ">
+                          h-full
 
-                      {
+                          rounded-full
 
-                        entry.positivity_score || 0
+                          bg-gradient-to-r
 
-                      }
+                          from-red-500
+                          to-orange-500
 
-                    </h3>
+                        "
+                      />
 
-                  </div>
+                    </div>
 
-                </div>
+                  </motion.div>
 
-                <div className="
-
-                  w-full h-3
-
-                  rounded-full
-
-                  overflow-hidden
-
-                  bg-black/[0.05]
-                  dark:bg-white/[0.05]
-
-                ">
+                  {/* Positivity */}
 
                   <motion.div
 
-                    initial={{
-                      width: 0,
-                    }}
-
-                    animate={{
-                      width:
-                        `${entry.positivity_score}%`,
-                    }}
-
-                    transition={{
-                      duration: 1,
+                    whileHover={{
+                      scale: 1.02,
                     }}
 
                     className="
 
-                      h-full
+                      rounded-[28px]
+
+                      p-6
+
+                      bg-gradient-to-br
+
+                      from-blue-500/10
+                      to-green-500/10
+
+                      border border-blue-500/10
+
+                    "
+                  >
+
+                    <div className="
+
+                      flex items-center gap-4
+
+                      mb-5
+
+                    ">
+
+                      <div className="
+
+                        w-12 h-12
+
+                        rounded-2xl
+
+                        flex items-center justify-center
+
+                        bg-blue-500/15
+
+                      ">
+
+                        <Heart
+
+                          size={22}
+
+                          className="text-blue-500"
+
+                        />
+
+                      </div>
+
+                      <div>
+
+                        <p className="
+
+                          text-sm
+
+                          text-[var(--text-secondary)]
+
+                        ">
+
+                          Positivity
+
+                        </p>
+
+                        <h3 className="
+
+                          text-3xl
+
+                          font-semibold
+
+                        ">
+
+                          {
+
+                            entry.positivity_score || 0
+
+                          }
+
+                        </h3>
+
+                      </div>
+
+                    </div>
+
+                    <div className="
+
+                      w-full h-3
 
                       rounded-full
 
-                      bg-gradient-to-r
+                      overflow-hidden
 
-                      from-blue-500
-                      to-green-500
+                      bg-black/[0.05]
+                      dark:bg-white/[0.05]
 
-                    "
-                  />
+                    ">
+
+                      <motion.div
+
+                        initial={{
+                          width: 0,
+                        }}
+
+                        animate={{
+                          width:
+                            `${entry.positivity_score}%`,
+                        }}
+
+                        transition={{
+                          duration: 1,
+                        }}
+
+                        className="
+
+                          h-full
+
+                          rounded-full
+
+                          bg-gradient-to-r
+
+                          from-blue-500
+                          to-green-500
+
+                        "
+                      />
+
+                    </div>
+
+                  </motion.div>
 
                 </div>
 
-              </motion.div>
+                {/* Themes */}
 
-            </div>
+                {
 
-            {/* Emotional Themes */}
+                  entry.themes && (
 
-            {
+                    <div className="mb-10">
 
-              entry.themes && (
+                      <h3 className="
+
+                        text-xl
+
+                        font-semibold
+
+                        mb-5
+
+                      ">
+
+                        Emotional Themes
+
+                      </h3>
+
+                      <div className="
+
+                        flex flex-wrap gap-3
+
+                      ">
+
+                        {
+
+                          entry.themes
+
+                            ?.split(',')
+
+                            ?.map(
+
+                              (
+                                theme: string,
+                                index: number
+                              ) => (
+
+                                <motion.div
+
+                                  key={index}
+
+                                  whileHover={{
+                                    scale: 1.05,
+                                  }}
+
+                                  className="
+
+                                    px-4 py-2
+
+                                    rounded-2xl
+
+                                    text-sm
+
+                                    backdrop-blur-xl
+
+                                    border
+
+                                    bg-black/[0.04]
+                                    dark:bg-white/[0.05]
+
+                                  "
+
+                                  style={{
+
+                                    borderColor:
+                                      'var(--border-color)',
+                                  }}
+                                >
+
+                                  {theme.trim()}
+
+                                </motion.div>
+                              )
+                            )
+                        }
+
+                      </div>
+
+                    </div>
+                  )
+                }
+
+                {/* Journal */}
 
                 <div className="mb-10">
 
@@ -670,151 +869,70 @@ export default function TimelinePage() {
 
                     font-semibold
 
-                    mb-5
+                    mb-4
 
                   ">
 
-                    Emotional Themes
+                    Journal Entry
 
                   </h3>
 
-                  <div className="
+                  <p className="
 
-                    flex flex-wrap gap-4
+                    leading-relaxed
+
+                    text-[var(--text-secondary)]
 
                   ">
 
-                    {
+                    {entry.content}
 
-                      entry.themes
-
-                        ?.split(',')
-
-                        ?.map(
-
-                          (
-                            theme: string,
-                            index: number
-                          ) => (
-
-                            <motion.div
-
-                              key={index}
-
-                              whileHover={{
-                                scale: 1.05,
-                              }}
-
-                              className="
-
-                                px-5 py-3
-
-                                rounded-2xl
-
-                                text-sm
-
-                                backdrop-blur-xl
-
-                                shadow-sm
-
-                                border
-
-                                bg-black/[0.04]
-                                dark:bg-white/[0.05]
-
-                              "
-
-                              style={{
-
-                                borderColor:
-                                  'var(--border-color)',
-                              }}
-                            >
-
-                              {theme.trim()}
-
-                            </motion.div>
-                          )
-                        )
-                    }
-
-                  </div>
+                  </p>
 
                 </div>
-              )
-            }
 
-            {/* Journal */}
+                {/* AI Reflection */}
 
-            <div className="mb-10">
+                <div>
 
-              <h3 className="
+                  <h3 className="
 
-                text-xl
+                    text-xl
 
-                font-semibold
+                    font-semibold
 
-                mb-4
+                    mb-4
 
-              ">
+                  ">
 
-                Journal Entry
+                    AI Reflection
 
-              </h3>
+                  </h3>
 
-              <p className="
+                  <p className="
 
-                leading-relaxed
+                    whitespace-pre-wrap
 
-                text-[var(--text-secondary)]
+                    leading-relaxed
 
-              ">
+                    text-[var(--text-secondary)]
 
-                {entry.content}
+                  ">
 
-              </p>
+                    {entry.ai_response}
 
-            </div>
+                  </p>
 
-            {/* Reflection */}
+                </div>
 
-            <div>
+              </motion.div>
+            ))
+          }
 
-              <h3 className="
+        </div>
 
-                text-xl
+      </main>
 
-                font-semibold
-
-                mb-4
-
-              ">
-
-                AI Reflection
-
-              </h3>
-
-              <p className="
-
-                whitespace-pre-wrap
-
-                leading-relaxed
-
-                text-[var(--text-secondary)]
-
-              ">
-
-                {entry.ai_response}
-
-              </p>
-
-            </div>
-
-          </motion.div>
-        ))}
-
-      </div>
-
-    </main>
+    </AuthGuard>
   )
 }
