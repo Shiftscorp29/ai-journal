@@ -1,6 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import {
+
+  useState,
+
+  useEffect,
+
+} from 'react'
 
 import {
 
@@ -25,6 +31,20 @@ import {
 import { supabase } from '@/lib/supabase'
 
 export default function AuthPage() {
+
+  // FORCE DARK MODE
+
+  useEffect(() => {
+
+    document.documentElement
+      .classList.add('dark')
+
+    localStorage.setItem(
+      'theme',
+      'dark'
+    )
+
+  }, [])
 
   const router = useRouter()
 
@@ -53,9 +73,7 @@ export default function AuthPage() {
       message: '',
     })
 
-  // -------------------------
   // NOTIFICATION
-  // -------------------------
 
   const showNotification = (
 
@@ -87,9 +105,7 @@ export default function AuthPage() {
     }, 3500)
   }
 
-  // -------------------------
   // AUTH
-  // -------------------------
 
   const handleAuth = async () => {
 
@@ -281,6 +297,10 @@ export default function AuthPage() {
 
         flex items-center justify-center
 
+        bg-black
+
+        text-white
+
       "
     >
 
@@ -304,8 +324,7 @@ export default function AuthPage() {
 
             rounded-full
 
-            bg-blue-400/20
-            dark:bg-blue-500/10
+            bg-blue-500/10
 
             blur-3xl
 
@@ -328,8 +347,7 @@ export default function AuthPage() {
 
             rounded-full
 
-            bg-purple-400/20
-            dark:bg-purple-500/10
+            bg-purple-500/10
 
             blur-3xl
 
@@ -352,8 +370,7 @@ export default function AuthPage() {
 
             rounded-full
 
-            bg-pink-400/10
-            dark:bg-pink-500/10
+            bg-pink-500/10
 
             blur-3xl
 
@@ -526,17 +543,13 @@ export default function AuthPage() {
 
             border
 
+            border-white/[0.08]
+
             backdrop-blur-xl
 
             mb-8
 
           "
-
-          style={{
-
-            borderColor:
-              'var(--border-color)',
-          }}
           >
 
             <Sparkles
@@ -551,7 +564,7 @@ export default function AuthPage() {
 
               text-sm
 
-              text-[var(--text-secondary)]
+              text-zinc-400
 
             ">
 
@@ -595,7 +608,7 @@ export default function AuthPage() {
 
             max-w-xl
 
-            text-[var(--text-secondary)]
+            text-zinc-400
 
           ">
 
@@ -636,16 +649,11 @@ export default function AuthPage() {
 
             border
 
+            border-white/[0.08]
+
+            bg-white/[0.04]
+
           "
-
-          style={{
-
-            background:
-              'var(--card-bg)',
-
-            borderColor:
-              'var(--border-color)',
-          }}
         >
 
           <h2 className="
@@ -676,7 +684,7 @@ export default function AuthPage() {
 
             mb-10
 
-            text-[var(--text-secondary)]
+            text-zinc-400
 
           ">
 
@@ -719,18 +727,15 @@ export default function AuthPage() {
 
                   border
 
-                  bg-black/[0.03]
-                  dark:bg-white/[0.04]
+                  border-white/[0.08]
+
+                  bg-white/[0.04]
 
                   outline-none
 
+                  text-white
+
                 "
-
-                style={{
-
-                  borderColor:
-                    'var(--border-color)',
-                }}
               />
             )
           }
@@ -763,18 +768,15 @@ export default function AuthPage() {
 
               border
 
-              bg-black/[0.03]
-              dark:bg-white/[0.04]
+              border-white/[0.08]
+
+              bg-white/[0.04]
 
               outline-none
 
+              text-white
+
             "
-
-            style={{
-
-              borderColor:
-                'var(--border-color)',
-            }}
           />
 
           {/* Password */}
@@ -805,18 +807,15 @@ export default function AuthPage() {
 
               border
 
-              bg-black/[0.03]
-              dark:bg-white/[0.04]
+              border-white/[0.08]
+
+              bg-white/[0.04]
 
               outline-none
 
+              text-white
+
             "
-
-            style={{
-
-              borderColor:
-                'var(--border-color)',
-            }}
           />
 
           {/* Button */}
@@ -835,11 +834,9 @@ export default function AuthPage() {
 
               rounded-2xl
 
-              bg-black
-              text-white
+              bg-white
 
-              dark:bg-white
-              dark:text-black
+              text-black
 
               font-medium
 
@@ -882,7 +879,7 @@ export default function AuthPage() {
 
               text-sm
 
-              text-[var(--text-secondary)]
+              text-zinc-400
 
               hover:underline
 

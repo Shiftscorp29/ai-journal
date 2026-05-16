@@ -6,6 +6,8 @@ import {
 
   useEffect,
 
+  useRef,
+
   useState,
 
 } from 'react'
@@ -24,13 +26,17 @@ import {
 
   Sun,
 
-  LogOut,
-
   Menu,
 
   X,
 
   User,
+
+  LogOut,
+
+  Settings,
+
+  Save,
 
 } from 'lucide-react'
 
@@ -46,14 +52,31 @@ export default function Navbar() {
 
   const router = useRouter()
 
+  const dropdownRef = useRef<any>(null)
+
   const [dark, setDark] =
     useState(true)
 
   const [menuOpen, setMenuOpen] =
     useState(false)
 
+  const [profileOpen, setProfileOpen] =
+    useState(false)
+
+  const [settingsOpen, setSettingsOpen] =
+    useState(false)
+
   const [username, setUsername] =
     useState('User')
+
+  const [newUsername, setNewUsername] =
+    useState('')
+
+  const [email, setEmail] =
+    useState('')
+
+  const [saving, setSaving] =
+    useState(false)
 
   useEffect(() => {
 
@@ -77,6 +100,40 @@ export default function Navbar() {
 
     fetchProfile()
 
+    const handleClickOutside = (
+      event: any
+    ) => {
+
+      if (
+
+        dropdownRef.current &&
+
+        !dropdownRef.current.contains(
+          event.target
+        )
+
+      ) {
+
+        setProfileOpen(false)
+      }
+    }
+
+    document.addEventListener(
+
+      'mousedown',
+
+      handleClickOutside
+    )
+
+    return () =>
+
+      document.removeEventListener(
+
+        'mousedown',
+
+        handleClickOutside
+      )
+
   }, [])
 
   // FETCH USER
@@ -90,6 +147,8 @@ export default function Navbar() {
     } = await supabase.auth.getUser()
 
     if (!user) return
+
+    setEmail(user.email || '')
 
     const { data } =
       await supabase
@@ -105,6 +164,51 @@ export default function Navbar() {
     if (data?.username) {
 
       setUsername(data.username)
+
+      setNewUsername(
+        data.username
+      )
+    }
+  }
+
+  // SAVE SETTINGS
+
+  const saveSettings = async () => {
+
+    try {
+
+      setSaving(true)
+
+      const {
+
+        data: { user },
+
+      } = await supabase.auth.getUser()
+
+      if (!user) return
+
+      await supabase
+
+        .from('profiles')
+
+        .update({
+
+          username: newUsername,
+        })
+
+        .eq('id', user.id)
+
+      setUsername(newUsername)
+
+      setSettingsOpen(false)
+
+    } catch (error) {
+
+      console.log(error)
+
+    } finally {
+
+      setSaving(false)
     }
   }
 
@@ -220,7 +324,7 @@ export default function Navbar() {
         }}
       >
 
-        {/* LEFT */}
+        {/* LOGO */}
 
         <div className="
 
@@ -250,7 +354,7 @@ export default function Navbar() {
 
         </div>
 
-        {/* CENTER */}
+        {/* DESKTOP NAV */}
 
         <div className="
 
@@ -304,190 +408,392 @@ export default function Navbar() {
 
         <div className="
 
-          flex items-center justify-end
-
-          gap-2
-
-          min-w-[140px]
+          flex items-center gap-2
 
           ml-auto
 
         ">
 
-          {/* USER */}
+          {/* PROFILE */}
 
-          <div className="
+          <div
 
-            hidden lg:flex
+            className="relative"
 
-            items-center gap-3
-
-            px-3 py-2
-
-            rounded-2xl
-
-            border
-
-            bg-black/[0.03]
-            dark:bg-white/[0.04]
-
-          "
-
-          style={{
-
-            borderColor:
-              'var(--border-color)',
-          }}
+            ref={dropdownRef}
           >
 
-            <div className="
+            <button
 
-              w-9 h-9
+              onClick={() =>
+                setProfileOpen(
+                  !profileOpen
+                )
+              }
 
-              rounded-xl
+              className="
 
-              flex items-center justify-center
+                flex items-center gap-3
 
-              bg-gradient-to-br
+                px-3 py-2
 
-              from-blue-500/20
-              to-purple-500/20
+                rounded-2xl
 
-            ">
+                border
 
-              <User size={16} />
+                bg-black/[0.08]
+                dark:bg-white/[0.10]
 
-            </div>
+                hover:bg-black/[0.10]
+                dark:hover:bg-white/[0.12]
 
-            <span className="
+                transition-all duration-300
 
-              text-sm
+              "
 
-              font-medium
+              style={{
 
-              max-w-[90px]
+                borderColor:
+                  'var(--border-color)',
+              }}
+            >
 
-              truncate
+              <div className="
 
-            ">
+                w-10 h-10
 
-              {username}
+                rounded-xl
 
-            </span>
+                flex items-center justify-center
+
+                bg-gradient-to-br
+
+                from-blue-500/20
+                to-purple-500/20
+
+              ">
+
+                <User size={18} />
+
+              </div>
+
+              <span className="
+
+                hidden sm:block
+
+                text-sm
+
+                font-medium
+
+                max-w-[100px]
+
+                truncate
+
+              ">
+
+                {username}
+
+              </span>
+
+            </button>
+
+            {/* DROPDOWN */}
+
+            <AnimatePresence>
+
+              {
+
+                profileOpen && (
+
+                  <motion.div
+
+                    initial={{
+                      opacity: 0,
+                      y: -10,
+                    }}
+
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                    }}
+
+                    exit={{
+                      opacity: 0,
+                      y: -10,
+                    }}
+
+                    className="
+
+                      absolute
+
+                      right-0
+
+                      top-[70px]
+
+                      w-[290px]
+
+                      rounded-[28px]
+
+                      p-4
+
+                      backdrop-blur-2xl
+
+                      border
+
+                      shadow-2xl
+
+                    "
+
+                    style={{
+
+                      background:
+                        'rgba(15,15,15,0.88)',
+
+                      borderColor:
+                        'var(--border-color)',
+                    }}
+                  >
+
+                    {/* USER */}
+
+                    <div className="
+
+                      flex items-center gap-3
+
+                      mb-5
+
+                      p-3
+
+                      rounded-2xl
+
+                      bg-black/[0.08]
+                      dark:bg-white/[0.10]
+
+                    ">
+
+                      <div className="
+
+                        w-12 h-12
+
+                        rounded-2xl
+
+                        flex items-center justify-center
+
+                        bg-gradient-to-br
+
+                        from-blue-500/20
+                        to-purple-500/20
+
+                      ">
+
+                        <User size={20} />
+
+                      </div>
+
+                      <div className="min-w-0">
+
+                        <h3 className="
+
+                          font-medium
+
+                          truncate
+
+                        ">
+
+                          {username}
+
+                        </h3>
+
+                        <p className="
+
+                          text-xs
+
+                          truncate
+
+                          text-[var(--text-secondary)]
+
+                        ">
+
+                          {email}
+
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                    {/* THEME */}
+
+                    <button
+
+                      onClick={toggleTheme}
+
+                      className="
+
+                        w-full
+
+                        flex items-center justify-between
+
+                        px-4 py-3
+
+                        rounded-2xl
+
+                        bg-black/[0.08]
+                        dark:bg-white/[0.10]
+
+                        mb-2
+
+                      "
+                    >
+
+                      <div className="
+
+                        flex items-center gap-3
+
+                      ">
+
+                        {
+
+                          dark
+
+                            ? (
+
+                              <Sun
+
+                                size={18}
+
+                                className="text-yellow-500"
+
+                              />
+
+                            )
+
+                            : (
+
+                              <Moon
+
+                                size={18}
+
+                                className="text-blue-500"
+
+                              />
+
+                            )
+                        }
+
+                        <span>
+
+                          Theme
+
+                        </span>
+
+                      </div>
+
+                      <span className="text-sm">
+
+                        {
+
+                          dark
+
+                            ? 'Dark'
+
+                            : 'Light'
+
+                        }
+
+                      </span>
+
+                    </button>
+
+                    {/* SETTINGS */}
+
+                    <button
+
+                      onClick={() =>
+                        setSettingsOpen(true)
+                      }
+
+                      className="
+
+                        w-full
+
+                        flex items-center gap-3
+
+                        px-4 py-3
+
+                        rounded-2xl
+
+                        bg-black/[0.08]
+                        dark:bg-white/[0.10]
+
+                        hover:bg-black/[0.10]
+                        dark:hover:bg-white/[0.12]
+
+                        transition-all duration-300
+
+                      "
+                    >
+
+                      <Settings size={18} />
+
+                      <span>
+
+                        Account Settings
+
+                      </span>
+
+                    </button>
+
+                    {/* LOGOUT */}
+
+                    <button
+
+                      onClick={logout}
+
+                      className="
+
+                        w-full
+
+                        flex items-center gap-3
+
+                        px-4 py-3
+
+                        rounded-2xl
+
+                        text-red-500
+
+                        bg-red-500/10
+
+                        mt-3
+
+                        hover:bg-red-500/20
+
+                        hover:scale-[1.02]
+
+                        active:scale-[0.98]
+
+                        transition-all duration-300
+
+                      "
+                    >
+
+                      <LogOut size={18} />
+
+                      <span>
+
+                        Logout
+
+                      </span>
+
+                    </button>
+
+                  </motion.div>
+                )
+              }
+
+            </AnimatePresence>
 
           </div>
-
-          {/* THEME */}
-
-          <button
-
-            onClick={toggleTheme}
-
-            className="
-
-              w-11 h-11
-
-              rounded-2xl
-
-              flex items-center justify-center
-
-              border
-
-              transition-all duration-300
-
-              hover:scale-105
-
-              bg-gradient-to-br
-
-              from-yellow-400/20
-              to-orange-400/20
-
-              dark:from-blue-500/20
-              dark:to-purple-500/20
-
-            "
-
-            style={{
-
-              borderColor:
-                'var(--border-color)',
-            }}
-          >
-
-            {
-
-              dark
-
-                ? (
-
-                  <Sun
-
-                    size={18}
-
-                    className="text-yellow-500"
-
-                  />
-
-                )
-
-                : (
-
-                  <Moon
-
-                    size={18}
-
-                    className="text-blue-500"
-
-                  />
-
-                )
-            }
-
-          </button>
-
-          {/* LOGOUT */}
-
-          <button
-
-            onClick={logout}
-
-            className="
-
-              w-11 h-11
-
-              rounded-2xl
-
-              flex items-center justify-center
-
-              border
-
-              transition-all duration-300
-
-              hover:scale-105
-
-              bg-gradient-to-br
-
-              from-red-500/20
-              to-orange-500/20
-
-            "
-
-            style={{
-
-              borderColor:
-                'var(--border-color)',
-            }}
-          >
-
-            <LogOut
-
-              size={18}
-
-              className="text-red-500"
-
-            />
-
-          </button>
 
           {/* MOBILE MENU */}
 
@@ -509,8 +815,8 @@ export default function Navbar() {
 
               border
 
-              bg-black/[0.04]
-              dark:bg-white/[0.05]
+              bg-black/[0.08]
+              dark:bg-white/[0.10]
 
             "
 
@@ -536,184 +842,6 @@ export default function Navbar() {
         </div>
 
       </motion.nav>
-
-      {/* MOBILE MENU */}
-
-      <AnimatePresence>
-
-        {
-
-          menuOpen && (
-
-            <motion.div
-
-              initial={{
-                opacity: 0,
-                y: -20,
-              }}
-
-              animate={{
-                opacity: 1,
-                y: 0,
-              }}
-
-              exit={{
-                opacity: 0,
-                y: -20,
-              }}
-
-              className="
-
-                fixed
-
-                top-24
-
-                left-1/2
-
-                -translate-x-1/2
-
-                z-[99]
-
-                w-[92%]
-
-                rounded-[32px]
-
-                p-5
-
-                backdrop-blur-2xl
-
-                border
-
-                shadow-2xl
-
-                md:hidden
-
-              "
-
-              style={{
-
-                background:
-                  'var(--card-bg)',
-
-                borderColor:
-                  'var(--border-color)',
-              }}
-            >
-
-              {/* USER */}
-
-              <div className="
-
-                flex items-center gap-3
-
-                mb-5
-
-                p-3
-
-                rounded-2xl
-
-                bg-black/[0.03]
-                dark:bg-white/[0.04]
-
-              ">
-
-                <div className="
-
-                  w-10 h-10
-
-                  rounded-xl
-
-                  flex items-center justify-center
-
-                  bg-gradient-to-br
-
-                  from-blue-500/20
-                  to-purple-500/20
-
-                ">
-
-                  <User size={18} />
-
-                </div>
-
-                <div>
-
-                  <p className="
-
-                    text-sm
-
-                    text-[var(--text-secondary)]
-
-                  ">
-
-                    Logged in as
-
-                  </p>
-
-                  <h3 className="font-medium">
-
-                    {username}
-
-                  </h3>
-
-                </div>
-
-              </div>
-
-              {/* LINKS */}
-
-              <div className="
-
-                flex flex-col gap-3
-
-              ">
-
-                {
-
-                  navLinks.map((link) => (
-
-                    <Link
-
-                      key={link.name}
-
-                      href={link.href}
-
-                      onClick={() =>
-                        setMenuOpen(false)
-                      }
-
-                      className="
-
-                        px-4 py-4
-
-                        rounded-2xl
-
-                        text-sm
-
-                        bg-black/[0.03]
-                        dark:bg-white/[0.04]
-
-                        hover:bg-black/[0.05]
-                        dark:hover:bg-white/[0.07]
-
-                        transition-all duration-300
-
-                      "
-                    >
-
-                      {link.name}
-
-                    </Link>
-                  ))
-                }
-
-              </div>
-
-            </motion.div>
-          )
-        }
-
-      </AnimatePresence>
 
     </>
   )
