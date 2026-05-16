@@ -192,11 +192,11 @@ export default function Navbar() {
           z-[100]
 
           w-[95%]
-          max-w-6xl
+          max-w-7xl
 
-          px-4 sm:px-6
+          h-[74px]
 
-          py-4
+          px-4 sm:px-6 lg:px-8
 
           rounded-[30px]
 
@@ -204,9 +204,9 @@ export default function Navbar() {
 
           border
 
-          flex items-center justify-between
-
           shadow-xl
+
+          flex items-center
 
         "
 
@@ -220,33 +220,47 @@ export default function Navbar() {
         }}
       >
 
-        {/* Logo */}
+        {/* LEFT */}
 
-        <Link href="/journal">
+        <div className="
 
-          <h1 className="
+          flex items-center
 
-            text-lg sm:text-xl
+          min-w-[140px]
 
-            font-semibold
+        ">
 
-            tracking-tight
+          <Link href="/journal">
 
-          ">
+            <h1 className="
 
-            MindFrame
+              text-lg sm:text-xl
 
-          </h1>
+              font-semibold
 
-        </Link>
+              tracking-tight
 
-        {/* Desktop Nav */}
+            ">
+
+              AI Journal
+
+            </h1>
+
+          </Link>
+
+        </div>
+
+        {/* CENTER */}
 
         <div className="
 
           hidden md:flex
 
-          items-center gap-3
+          flex-1
+
+          items-center justify-center
+
+          gap-3
 
         ">
 
@@ -262,11 +276,13 @@ export default function Navbar() {
 
                 className="
 
-                  px-4 py-2
+                  px-5 py-2.5
 
                   rounded-2xl
 
                   text-sm
+
+                  font-medium
 
                   hover:bg-black/[0.05]
                   dark:hover:bg-white/[0.05]
@@ -284,15 +300,21 @@ export default function Navbar() {
 
         </div>
 
-        {/* Right */}
+        {/* RIGHT */}
 
         <div className="
 
-          flex items-center gap-2
+          flex items-center justify-end
+
+          gap-2
+
+          min-w-[140px]
+
+          ml-auto
 
         ">
 
-          {/* User */}
+          {/* USER */}
 
           <div className="
 
@@ -300,7 +322,7 @@ export default function Navbar() {
 
             items-center gap-3
 
-            px-4 py-2
+            px-3 py-2
 
             rounded-2xl
 
@@ -343,6 +365,10 @@ export default function Navbar() {
 
               font-medium
 
+              max-w-[90px]
+
+              truncate
+
             ">
 
               {username}
@@ -351,7 +377,7 @@ export default function Navbar() {
 
           </div>
 
-          {/* Theme */}
+          {/* THEME */}
 
           <button
 
@@ -366,6 +392,10 @@ export default function Navbar() {
               flex items-center justify-center
 
               border
+
+              transition-all duration-300
+
+              hover:scale-105
 
               bg-gradient-to-br
 
@@ -415,7 +445,7 @@ export default function Navbar() {
 
           </button>
 
-          {/* Logout */}
+          {/* LOGOUT */}
 
           <button
 
@@ -430,6 +460,10 @@ export default function Navbar() {
               flex items-center justify-center
 
               border
+
+              transition-all duration-300
+
+              hover:scale-105
 
               bg-gradient-to-br
 
@@ -455,7 +489,7 @@ export default function Navbar() {
 
           </button>
 
-          {/* Mobile Menu */}
+          {/* MOBILE MENU */}
 
           <button
 
@@ -566,7 +600,7 @@ export default function Navbar() {
               }}
             >
 
-              {/* Mobile User */}
+              {/* USER */}
 
               <div className="
 
@@ -626,7 +660,7 @@ export default function Navbar() {
 
               </div>
 
-              {/* Links */}
+              {/* LINKS */}
 
               <div className="
 
