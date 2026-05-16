@@ -54,6 +54,8 @@ export default function Navbar() {
 
   const dropdownRef = useRef<any>(null)
 
+  const mobileMenuRef = useRef<any>(null)
+
   const [dark, setDark] =
     useState(true)
 
@@ -104,6 +106,8 @@ export default function Navbar() {
       event: any
     ) => {
 
+      // PROFILE
+
       if (
 
         dropdownRef.current &&
@@ -115,6 +119,21 @@ export default function Navbar() {
       ) {
 
         setProfileOpen(false)
+      }
+
+      // MOBILE MENU
+
+      if (
+
+        mobileMenuRef.current &&
+
+        !mobileMenuRef.current.contains(
+          event.target
+        )
+
+      ) {
+
+        setMenuOpen(false)
       }
     }
 
@@ -136,7 +155,7 @@ export default function Navbar() {
 
   }, [])
 
-  // FETCH USER
+  // FETCH PROFILE
 
   const fetchProfile = async () => {
 
@@ -252,17 +271,23 @@ export default function Navbar() {
   const navLinks = [
 
     {
+
       name: 'Journal',
+
       href: '/journal',
     },
 
     {
+
       name: 'Timeline',
+
       href: '/timeline',
     },
 
     {
+
       name: 'Analytics',
+
       href: '/analytics',
     },
   ]
@@ -497,7 +522,7 @@ export default function Navbar() {
 
             </button>
 
-            {/* DROPDOWN */}
+            {/* PROFILE DROPDOWN */}
 
             <AnimatePresence>
 
@@ -656,29 +681,10 @@ export default function Navbar() {
 
                           dark
 
-                            ? (
+                            ? <Sun size={18} />
 
-                              <Sun
+                            : <Moon size={18} />
 
-                                size={18}
-
-                                className="text-yellow-500"
-
-                              />
-
-                            )
-
-                            : (
-
-                              <Moon
-
-                                size={18}
-
-                                className="text-blue-500"
-
-                              />
-
-                            )
                         }
 
                         <span>
@@ -710,7 +716,9 @@ export default function Navbar() {
                     <button
 
                       onClick={() =>
-                        setSettingsOpen(true)
+                        setSettingsOpen(
+                          !settingsOpen
+                        )
                       }
 
                       className="
@@ -743,6 +751,152 @@ export default function Navbar() {
                       </span>
 
                     </button>
+
+                    {/* SETTINGS PANEL */}
+
+                    <AnimatePresence>
+
+                      {
+
+                        settingsOpen && (
+
+                          <motion.div
+
+                            initial={{
+                              opacity: 0,
+                              height: 0,
+                            }}
+
+                            animate={{
+                              opacity: 1,
+                              height: 'auto',
+                            }}
+
+                            exit={{
+                              opacity: 0,
+                              height: 0,
+                            }}
+
+                            className="
+
+                              overflow-hidden
+
+                              mt-3
+
+                            "
+                          >
+
+                            <div className="
+
+                              p-4
+
+                              rounded-2xl
+
+                              bg-black/[0.08]
+                              dark:bg-white/[0.08]
+
+                            ">
+
+                              <label className="
+
+                                text-sm
+
+                                text-[var(--text-secondary)]
+
+                              ">
+
+                                Username
+
+                              </label>
+
+                              <input
+
+                                value={
+                                  newUsername
+                                }
+
+                                onChange={(e) =>
+                                  setNewUsername(
+                                    e.target.value
+                                  )
+                                }
+
+                                className="
+
+                                  w-full
+
+                                  h-12
+
+                                  px-4
+
+                                  rounded-2xl
+
+                                  mt-2 mb-4
+
+                                  border
+
+                                  bg-transparent
+
+                                  outline-none
+
+                                "
+
+                                style={{
+
+                                  borderColor:
+                                    'var(--border-color)',
+                                }}
+                              />
+
+                              <button
+
+                                onClick={
+                                  saveSettings
+                                }
+
+                                disabled={
+                                  saving
+                                }
+
+                                className="
+
+                                  w-full
+
+                                  h-12
+
+                                  rounded-2xl
+
+                                  bg-white
+                                  text-black
+
+                                  font-medium
+
+                                  flex items-center justify-center gap-2
+
+                                "
+                              >
+
+                                <Save size={16} />
+
+                                {
+
+                                  saving
+
+                                    ? 'Saving...'
+
+                                    : 'Save Changes'
+
+                                }
+
+                              </button>
+
+                            </div>
+
+                          </motion.div>
+                        )
+                      }
+
+                    </AnimatePresence>
 
                     {/* LOGOUT */}
 
@@ -795,7 +949,7 @@ export default function Navbar() {
 
           </div>
 
-          {/* MOBILE MENU */}
+          {/* MOBILE BUTTON */}
 
           <button
 
@@ -842,6 +996,124 @@ export default function Navbar() {
         </div>
 
       </motion.nav>
+
+      {/* MOBILE MENU */}
+
+      <AnimatePresence>
+
+        {
+
+          menuOpen && (
+
+            <motion.div
+
+              ref={mobileMenuRef}
+
+              initial={{
+                opacity: 0,
+                y: -20,
+              }}
+
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+
+              exit={{
+                opacity: 0,
+                y: -20,
+              }}
+
+              className="
+
+                fixed
+
+                top-[95px]
+                left-1/2
+
+                -translate-x-1/2
+
+                z-[90]
+
+                w-[95%]
+
+                rounded-[30px]
+
+                p-5
+
+                backdrop-blur-2xl
+
+                border
+
+                shadow-2xl
+
+                md:hidden
+
+              "
+
+              style={{
+
+                background:
+                  'rgba(15,15,15,0.92)',
+
+                borderColor:
+                  'var(--border-color)',
+              }}
+            >
+
+              <div className="
+
+                flex flex-col gap-3
+
+              ">
+
+                {
+
+                  navLinks.map((link) => (
+
+                    <Link
+
+                      key={link.name}
+
+                      href={link.href}
+
+                      onClick={() =>
+                        setMenuOpen(false)
+                      }
+
+                      className="
+
+                        h-14
+
+                        rounded-2xl
+
+                        flex items-center
+
+                        px-5
+
+                        bg-black/[0.08]
+                        dark:bg-white/[0.08]
+
+                        text-base
+
+                        font-medium
+
+                      "
+                    >
+
+                      {link.name}
+
+                    </Link>
+                  ))
+                }
+
+              </div>
+
+            </motion.div>
+          )
+        }
+
+      </AnimatePresence>
 
     </>
   )
